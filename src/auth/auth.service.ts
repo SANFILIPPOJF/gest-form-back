@@ -12,6 +12,7 @@ export class AuthService {
 
         const payload = { cp: cp, id: id };
         return {
+            statutCode: 200,
             access_token: await this.jwtService.signAsync(payload),
         };
     }

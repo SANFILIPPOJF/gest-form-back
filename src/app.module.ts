@@ -7,6 +7,10 @@ import { UsersService } from './users/users.service';
 import { UsersController } from './users/users.controller';
 import { ConfigModule } from '@nestjs/config';
 import { join } from 'path';
+import { ResidencesModule } from './residences/residences.module';
+import { Residence } from './residences/entities/residence.entity';
+import { FonctionsModule } from './fonctions/fonctions.module';
+import { Fonction } from './fonctions/entities/fonction.entity';
 
 @Module({
   imports: [UsersModule, AuthModule,
@@ -18,10 +22,12 @@ import { join } from 'path';
       username: process.env.DB_USERNAME,
       password: process.env.DB_PASSWORD,
       database: process.env.DB_NAME,
-      entities: [User],
+      entities: [User,Residence,Fonction],
       synchronize: true,
       logging: false,
     }),
+    ResidencesModule,
+    FonctionsModule,
   ],
   controllers: [UsersController],
   providers: [UsersService],
