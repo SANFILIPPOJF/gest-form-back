@@ -9,6 +9,9 @@ export class Residence extends BaseEntity{
     @Column({ unique: true })
     name: string;
 
+    @Column({ default: true })
+    isActive: boolean;
+
     @OneToMany(() => User, (user) => user.residence, {nullable : true})
     user: User[]
 }

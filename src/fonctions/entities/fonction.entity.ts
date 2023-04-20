@@ -1,5 +1,6 @@
+import { FormationType } from "src/formation-types/entities/formation-type.entity";
 import { User } from "src/users/entities/user.entity";
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, ManyToMany, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity('fonctions')
 export class Fonction {
@@ -9,6 +10,12 @@ export class Fonction {
     @Column({ unique: true })
     name: string;
 
+    @Column({ default: true })
+    isActive: boolean;
+
     @OneToMany(() => User, (user) => user.fonction, {nullable : true})
     user: User[]
+
+    @ManyToMany(() => FormationType, (formationType) => formationType.concerne, { nullable: true })
+    formationTypes: FormationType[]
 }

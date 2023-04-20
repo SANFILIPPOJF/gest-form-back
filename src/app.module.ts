@@ -11,6 +11,12 @@ import { ResidencesModule } from './residences/residences.module';
 import { Residence } from './residences/entities/residence.entity';
 import { FonctionsModule } from './fonctions/fonctions.module';
 import { Fonction } from './fonctions/entities/fonction.entity';
+import { FormationsModule } from './formations/formations.module';
+import { Formation } from './formations/entities/formation.entity';
+import { FormationTypesModule } from './formation-types/formation-types.module';
+import { FormationType } from './formation-types/entities/formation-type.entity';
+import { SallesModule } from './salles/salles.module';
+import { Salle } from './salles/entities/salle.entity';
 
 @Module({
   imports: [UsersModule, AuthModule,
@@ -22,12 +28,15 @@ import { Fonction } from './fonctions/entities/fonction.entity';
       username: process.env.DB_USERNAME,
       password: process.env.DB_PASSWORD,
       database: process.env.DB_NAME,
-      entities: [User,Residence,Fonction],
+      entities: [User,Residence,Fonction,Formation,FormationType,Salle],
       synchronize: true,
       logging: false,
     }),
     ResidencesModule,
     FonctionsModule,
+    FormationsModule,
+    FormationTypesModule,
+    SallesModule,
   ],
   controllers: [UsersController],
   providers: [UsersService],
