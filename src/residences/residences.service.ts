@@ -3,7 +3,7 @@ import { ResidenceDto } from './dto/residence.dto';
 
 @Injectable()
 export class ResidencesService {
-  create(createResidenceDto: ResidenceDto) {
+  create(ResidenceDto: ResidenceDto) {
     return 'This action adds a new residence';
   }
 
