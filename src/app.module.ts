@@ -17,6 +17,8 @@ import { FormationTypesModule } from './formation-types/formation-types.module';
 import { FormationType } from './formation-types/entities/formation-type.entity';
 import { SallesModule } from './salles/salles.module';
 import { Salle } from './salles/entities/salle.entity';
+import { HabilitationsModule } from './habilitations/habilitations.module';
+import { Habilitation } from './habilitations/entities/habilitation.entity';
 
 @Module({
   imports: [UsersModule, AuthModule,
@@ -28,7 +30,7 @@ import { Salle } from './salles/entities/salle.entity';
       username: process.env.DB_USERNAME,
       password: process.env.DB_PASSWORD,
       database: process.env.DB_NAME,
-      entities: [User,Residence,Fonction,Formation,FormationType,Salle],
+      entities: [User,Residence,Fonction,Formation,FormationType,Salle,Habilitation],
       synchronize: true,
       logging: false,
     }),
@@ -37,6 +39,7 @@ import { Salle } from './salles/entities/salle.entity';
     FormationsModule,
     FormationTypesModule,
     SallesModule,
+    HabilitationsModule,
   ],
   controllers: [UsersController],
   providers: [UsersService],

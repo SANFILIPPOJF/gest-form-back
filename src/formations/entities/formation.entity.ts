@@ -1,3 +1,5 @@
+import { IsNotEmpty, IsString } from "class-validator";
+import { FormationType } from "src/formation-types/entities/formation-type.entity";
 import { Salle } from "src/salles/entities/salle.entity";
 import { User } from "src/users/entities/user.entity";
 import { BaseEntity, Column, Entity, JoinTable, ManyToMany, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
@@ -12,6 +14,13 @@ export class Formation extends BaseEntity {
 
     @Column({ default: 0 })
     status: number;
+
+    @IsString()
+    @IsNotEmpty()
+    motifAnnulation: string;
+
+    @ManyToOne(() => FormationType, (formationType) => formationType.formations, {nullable : true})
+    formationType: FormationType;
 
     @ManyToMany(() => User, (user) => user.formations, { nullable: true })
     @JoinTable({
