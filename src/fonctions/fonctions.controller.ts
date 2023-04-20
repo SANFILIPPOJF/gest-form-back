@@ -1,15 +1,15 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
 import { FonctionsService } from './fonctions.service';
-import { CreateFonctionDto } from './dto/create-fonction.dto';
-import { UpdateFonctionDto } from './dto/update-fonction.dto';
+import { FonctionDto } from './dto/fonction.dto';
+
 
 @Controller('fonctions')
 export class FonctionsController {
   constructor(private readonly fonctionsService: FonctionsService) {}
 
   @Post()
-  create(@Body() createFonctionDto: CreateFonctionDto) {
-    return this.fonctionsService.create(createFonctionDto);
+  create(@Body() FonctionDto: FonctionDto) {
+    return this.fonctionsService.create(FonctionDto);
   }
 
   @Get()
@@ -23,8 +23,8 @@ export class FonctionsController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateFonctionDto: UpdateFonctionDto) {
-    return this.fonctionsService.update(+id, updateFonctionDto);
+  update(@Param('id') id: string, @Body() FonctionDto: FonctionDto) {
+    return this.fonctionsService.update(+id, FonctionDto);
   }
 
   @Delete(':id')
