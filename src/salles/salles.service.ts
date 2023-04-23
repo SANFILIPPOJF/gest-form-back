@@ -13,8 +13,10 @@ export class SallesService {
     }
   }
 
-  async active(salle: Salle) {
+  async active(salle: Salle, createSalleDto: CreateSalleDto) {
     try {
+      salle.adresse = createSalleDto.adresse;
+      salle.capacite = createSalleDto.capacite;
       salle.isActive = true;
       return await salle.save();
     } catch (error) {

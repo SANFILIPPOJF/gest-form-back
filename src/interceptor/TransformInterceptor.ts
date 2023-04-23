@@ -33,6 +33,7 @@ export class TransformInterceptor<T>
             map((data) => ({
                 statusCode: context.switchToHttp().getResponse().statusCode,
                 reqId: context.switchToHttp().getRequest().reqId,
+                timestamp: new Date().toISOString(),
                 status: context.switchToHttp().getResponse().statusCode < 300 ? STATUS.OK : STATUS.FAILED,
                 data: data,
             }))

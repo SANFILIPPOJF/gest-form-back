@@ -16,7 +16,7 @@ export class SallesController {
     const sameSalle = await this.sallesService.findOneByName(createSalleDto.name);
     if (!sameSalle) return this.sallesService.create(createSalleDto);
     if (sameSalle.isActive) throw new HttpException('Salle allready exist', HttpStatus.CONFLICT);
-    return this.sallesService.active(sameSalle);
+    return this.sallesService.active(sameSalle,createSalleDto);
   }
 
   @Get()
@@ -24,11 +24,6 @@ export class SallesController {
     const salles = await this.sallesService.findAll();
     if (salles.length===0) throw new HttpException('No salle found', HttpStatus.NOT_FOUND);
     return salles
-  }
-
-  @Get(':name')
-  findOne(@Param('name') name: string) {
-    return this.sallesService.findOneByName(name);
   }
 
   @Patch(':id')
