@@ -1,26 +1,67 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { CreateSalleDto } from './dto/create-salle.dto';
 import { UpdateSalleDto } from './dto/update-salle.dto';
+import { Salle } from './entities/salle.entity';
 
 @Injectable()
 export class SallesService {
-  create(createSalleDto: CreateSalleDto) {
-    return 'This action adds a new salle';
+  async create(createSalleDto: CreateSalleDto) {
+    try {
+      return await Salle.create({...createSalleDto}).save();
+    } catch (error) {
+      throw new InternalServerErrorException();
+    }
   }
 
-  findAll() {
-    return `This action returns all salles`;
+  async active(salle: Salle) {
+    try {
+      salle.isActive = true;
+      return await salle.save();
+    } catch (error) {
+      throw new InternalServerErrorException();
+    }
+  }
+  async findAll() {
+    try {
+      return Salle.findBy({isActive: true});
+    } catch (error) {
+      throw new InternalServerErrorException();
+    }
   }
 
   findOne(id: number) {
-    return `This action returns a #${id} salle`;
+    try {
+      return Salle.findOneBy({id})
+    } catch (error) {
+      throw new InternalServerErrorException();
+    }
   }
 
-  update(id: number, updateSalleDto: UpdateSalleDto) {
-    return `This action updates a #${id} salle`;
+  async findOneByName(name: string) {
+    try {
+      return await Salle.findOneBy({ name })
+    } catch (error) {
+      throw new InternalServerErrorException();
+    }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} salle`;
+  async update(salle: Salle, updateSalleDto: UpdateSalleDto) {
+    try {
+      if (updateSalleDto.adresse) salle.adresse=updateSalleDto.adresse;
+      if (updateSalleDto.name) salle.name=updateSalleDto.name;
+      if (updateSalleDto.capacite) salle.capacite=updateSalleDto.capacite;
+      return await salle.save()
+    } catch (error) {
+      throw new InternalServerErrorException();
+    }
+  }
+
+  async remove(salle: Salle) {
+    try {
+      salle.isActive=false;
+      return await salle.save();
+    } catch (error) {
+      throw new InternalServerErrorException();
+    }
   }
 }

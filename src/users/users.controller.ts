@@ -25,7 +25,7 @@ export class UsersController {
       return await this.usersService.create(createUserDto);
     }
     if (userTest.isActive) throw new HttpException('User allready exist', HttpStatus.CONFLICT);
-    return await this.usersService.active(userTest.id,createUserDto);
+    return await this.usersService.active(userTest,createUserDto);
   }
 
   @Get('cp/:cp')
@@ -52,8 +52,8 @@ export class UsersController {
     const userFound = await this.usersService.findOneById(+id);
     if (!userFound) throw new HttpException('User not found', HttpStatus.NOT_FOUND);
     if (!userFound.isActive) throw new HttpException('User deleted', HttpStatus.NOT_FOUND);
-    updateUserDto.password = await bcrypt.hash(updateUserDto.password, 10)
-    return await this.usersService.update(+id, updateUserDto);
+    userFound.password = await bcrypt.hash(updateUserDto.password, 10)
+    return await this.usersService.update(userFound, updateUserDto);
   }
 
   @Delete(':id')
@@ -62,7 +62,7 @@ export class UsersController {
     const userFound = await this.usersService.findOneById(+id);
     if (!userFound) throw new HttpException('User not found', HttpStatus.NOT_FOUND);
     if (!userFound.isActive) throw new HttpException('User allready deleted', HttpStatus.NOT_FOUND);
-    await this.usersService.remove(+id);
+    await this.usersService.remove(userFound);
     throw new HttpException('User deleted', HttpStatus.ACCEPTED);
   }
 }

@@ -34,9 +34,8 @@ export class UsersService {
       throw new InternalServerErrorException();
     }
   }
-  async update(id: number, updateUserDto: UpdateUserDto) {
+  async update(user:User, updateUserDto: UpdateUserDto) {
     try {
-      const user = await User.findOneBy({ id });
       if (updateUserDto.cp) user.cp = updateUserDto.cp.toUpperCase();
       if (updateUserDto.name) user.name = updateUserDto.name;
       if (updateUserDto.password) user.password = updateUserDto.password;
@@ -49,9 +48,8 @@ export class UsersService {
     }
   }
 
-  async active(id: number, createUserDto: CreateUserDto) {
+  async active(user: User, createUserDto: CreateUserDto) {
     try {
-      const user = await User.findOneBy({ id });
       user.name = createUserDto.name;
       user.password = createUserDto.password;
       user.isActive = true;
@@ -63,9 +61,8 @@ export class UsersService {
       throw new InternalServerErrorException();
     }
   }
-  async remove(id: number) {
+  async remove(user: User) {
     try {
-      const user = await this.findOneById(id);
       user.isActive=false;
       await user.save();
       return

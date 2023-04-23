@@ -7,10 +7,10 @@ export class Salle extends BaseEntity{
     id: number;
 
     @Column()
-    name: String;
+    name: string;
 
     @Column()
-    adresse: String;
+    adresse: string;
 
     @Column()
     capacite: number;

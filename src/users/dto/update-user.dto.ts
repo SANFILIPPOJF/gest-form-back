@@ -4,7 +4,7 @@ import { IsNotEmpty, IsString, Length } from 'class-validator';
 
 export class UpdateUserDto extends PartialType(CreateUserDto) {
     @IsString()
-    @Length(8)
+    @Length(8,8)
     cp: string;
 
     @IsString()
