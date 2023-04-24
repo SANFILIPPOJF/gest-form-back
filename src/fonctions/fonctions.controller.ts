@@ -1,34 +1,44 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors, HttpException, HttpStatus } from '@nestjs/common';
 import { FonctionsService } from './fonctions.service';
 import { FonctionDto } from './dto/fonction.dto';
-
+import { TransformInterceptor } from 'src/interceptor/TransformInterceptor';
+import { ApiTags } from '@nestjs/swagger';
 
 @Controller('fonctions')
+@UseInterceptors(TransformInterceptor) // transforme toutes les responses avec statusCode, status et data
+@ApiTags('FONCTIONS') // cree une categorie FONCTIONS dans swagger UI
 export class FonctionsController {
   constructor(private readonly fonctionsService: FonctionsService) {}
 
   @Post()
-  create(@Body() FonctionDto: FonctionDto) {
-    return this.fonctionsService.create(FonctionDto);
+  async create(@Body() fonctionDto: FonctionDto) {
+  const sameFonction = await this.fonctionsService.findOneByName(fonctionDto.name);
+  if (!sameFonction) return this.fonctionsService.create(fonctionDto);
+  if (sameFonction.isActive) throw new HttpException('Salle allready exist', HttpStatus.CONFLICT);
+  return this.fonctionsService.active(sameFonction);
   }
 
   @Get()
-  findAll() {
-    return this.fonctionsService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.fonctionsService.findOne(+id);
+  async findAll() {
+    const fonctions = await this.fonctionsService.findAll();
+    if (fonctions.length === 0) throw new HttpException('No fonction found', HttpStatus.NOT_FOUND);
+    return fonctions
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() FonctionDto: FonctionDto) {
-    return this.fonctionsService.update(+id, FonctionDto);
+  async update(@Param('id') id: string, @Body() fonctionDto: FonctionDto) {
+    const fonctionFound = await this.fonctionsService.findOne(+id);
+    if (!fonctionFound) throw new HttpException('fonction not found', HttpStatus.NOT_FOUND);
+    if (!fonctionFound.isActive) throw new HttpException('fonction deleted', HttpStatus.NOT_FOUND);
+    return this.fonctionsService.update(fonctionFound, fonctionDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.fonctionsService.remove(+id);
+  async remove(@Param('id') id: string) {
+    if (isNaN(+id) || +id < 1 || Math.floor(+id) !== +id) throw new HttpException('ID must be a positive integer', HttpStatus.BAD_REQUEST);
+    const fonctionFound = await this.fonctionsService.findOne(+id);
+    if (!fonctionFound) throw new HttpException('fonction not found', HttpStatus.NOT_FOUND);
+    if (!fonctionFound.isActive) throw new HttpException('fonction already deleted', HttpStatus.BAD_REQUEST);
+    return this.fonctionsService.remove(fonctionFound);
   }
 }

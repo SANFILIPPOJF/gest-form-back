@@ -8,7 +8,7 @@ import { ApiTags } from '@nestjs/swagger';
 
 @Controller('formation-types')
 @UseInterceptors(TransformInterceptor) // transforme toutes les responses avec statusCode, status et data
-@ApiTags('TYPE FORMATION') // cree une categorie USERS dans swagger UI
+@ApiTags('TYPE FORMATION') // cree une categorie TYPE FORMATION dans swagger UI
 export class FormationTypesController {
   constructor(private readonly formationTypesService: FormationTypesService) { }
 

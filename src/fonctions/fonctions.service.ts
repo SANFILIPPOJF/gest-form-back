@@ -1,26 +1,64 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { FonctionDto } from './dto/fonction.dto';
+import { Fonction } from './entities/fonction.entity';
 
 
 @Injectable()
 export class FonctionsService {
-  create(FonctionDto: FonctionDto) {
-    return 'This action adds a new fonction';
+  async create(fonctionDto: FonctionDto) {
+    try {
+      return await Fonction.create({...fonctionDto}).save();
+    } catch (error) {
+      throw new InternalServerErrorException();
+    }
   }
 
-  findAll() {
-    return `This action returns all fonctions`;
+  async active(fonction: Fonction) {
+    try {
+      fonction.isActive = true;
+      return await fonction.save();
+    } catch (error) {
+      throw new InternalServerErrorException();
+    }
+  }
+  async findAll() {
+    try {
+      return await Fonction.findBy({isActive: true});
+    } catch (error) {
+      throw new InternalServerErrorException();
+    }
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} fonction`;
+  async findOne(id: number) {
+    try {
+      return await Fonction.findOneBy({id})
+    } catch (error) {
+      throw new InternalServerErrorException();
+    }
   }
 
-  update(id: number, FonctionDto: FonctionDto) {
-    return `This action updates a #${id} fonction`;
+  async findOneByName(name: string) {
+    try {
+      return await Fonction.findOneBy({ name })
+    } catch (error) {
+      throw new InternalServerErrorException();
+    }
+  }
+  async update(fonction: Fonction, fonctionDto: FonctionDto) {
+    try {
+      fonction.name=fonctionDto.name;
+      return await fonction.save()
+    } catch (error) {
+      throw new InternalServerErrorException();
+    }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} fonction`;
+  async remove(fonction: Fonction) {
+    try {
+      fonction.isActive=false;
+      return await fonction.save();
+    } catch (error) {
+      throw new InternalServerErrorException();
+    }
   }
 }

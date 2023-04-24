@@ -1,9 +1,9 @@
 import { FormationType } from "src/formation-types/entities/formation-type.entity";
 import { User } from "src/users/entities/user.entity";
-import { Column, Entity, ManyToMany, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { BaseEntity, Column, Entity, ManyToMany, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity('fonctions')
-export class Fonction {
+export class Fonction extends BaseEntity{
     @PrimaryGeneratedColumn()
     id: number;
 
