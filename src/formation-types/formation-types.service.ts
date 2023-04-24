@@ -1,26 +1,69 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { CreateFormationTypeDto } from './dto/create-formation-type.dto';
 import { UpdateFormationTypeDto } from './dto/update-formation-type.dto';
+import { FormationType } from './entities/formation-type.entity';
 
 @Injectable()
 export class FormationTypesService {
-  create(createFormationTypeDto: CreateFormationTypeDto) {
-    return 'This action adds a new formationType';
+  async create(createFormationTypeDto: CreateFormationTypeDto) {
+    try {
+      return await FormationType.create({...createFormationTypeDto}).save();
+    } catch (error) {
+      throw new InternalServerErrorException();
+    }
   }
 
+  async active(formationType: FormationType, createFormationTypeDto: CreateFormationTypeDto) {
+    try {
+      formationType.codeRAF = createFormationTypeDto.codeRAF;
+      formationType.duree = createFormationTypeDto.duree;
+      formationType.isActive = true;
+      return await formationType.save();
+    } catch (error) {
+      throw new InternalServerErrorException();
+    }
+  }
   findAll() {
-    return `This action returns all formationTypes`;
+    try {
+      return FormationType.findBy({isActive: true});
+    } catch (error) {
+      throw new InternalServerErrorException();
+    }
   }
 
   findOne(id: number) {
-    return `This action returns a #${id} formationType`;
+    try {
+      return FormationType.findOneBy({id})
+    } catch (error) {
+      throw new InternalServerErrorException();
+    }
   }
 
-  update(id: number, updateFormationTypeDto: UpdateFormationTypeDto) {
-    return `This action updates a #${id} formationType`;
+  async findOneByName(name: string) {
+    try {
+      return await FormationType.findOneBy({ name })
+    } catch (error) {
+      throw new InternalServerErrorException();
+    }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} formationType`;
+  async update(formationType: FormationType, updateFormationTypeDto: UpdateFormationTypeDto) {
+    try {
+      if (updateFormationTypeDto.codeRAF) formationType.codeRAF=updateFormationTypeDto.codeRAF;
+      if (updateFormationTypeDto.name) formationType.name=updateFormationTypeDto.name;
+      if (updateFormationTypeDto.duree) formationType.duree=updateFormationTypeDto.duree;
+      return await formationType.save()
+    } catch (error) {
+      throw new InternalServerErrorException();
+    }
+  }
+
+  async remove(formationType: FormationType) {
+    try {
+      formationType.isActive=false;
+      return await formationType.save();
+    } catch (error) {
+      throw new InternalServerErrorException();
+    }
   }
 }

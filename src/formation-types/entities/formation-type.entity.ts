@@ -10,13 +10,13 @@ export class FormationType extends BaseEntity{
     id: number;
 
     @Column()
-    name: String;
+    name: string;
 
     @Column()
-    codeRAF: String;
+    codeRAF: string;
 
     @Column()
-    duree: String;
+    duree: string;
 
     @Column({default: true})
     isActive: boolean;
