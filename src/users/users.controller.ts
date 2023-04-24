@@ -39,7 +39,7 @@ export class UsersController {
 
   @Get(':id')
   async findOneById(@Param('id') id: string) {
-    if (isNaN(+id)) throw new HttpException('ID must be a number', HttpStatus.BAD_REQUEST);
+    if (isNaN(+id) || +id < 1 || Math.floor(+id)!==+id) throw new HttpException('ID must be a positive integer', HttpStatus.BAD_REQUEST);
     const userFound = await this.usersService.findOneById(+id);
     if (!userFound) throw new HttpException('User not found', HttpStatus.NOT_FOUND);
     if (!userFound.isActive) throw new HttpException('User deleted', HttpStatus.NOT_FOUND);
@@ -48,7 +48,7 @@ export class UsersController {
 
   @Patch(':id')
   async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    if (isNaN(+id)) throw new HttpException('ID must be a number', HttpStatus.BAD_REQUEST);
+    if (isNaN(+id) || +id < 1 || Math.floor(+id)!==+id) throw new HttpException('ID must be a positive integer', HttpStatus.BAD_REQUEST);
     const userFound = await this.usersService.findOneById(+id);
     if (!userFound) throw new HttpException('User not found', HttpStatus.NOT_FOUND);
     if (!userFound.isActive) throw new HttpException('User deleted', HttpStatus.NOT_FOUND);
@@ -58,7 +58,7 @@ export class UsersController {
 
   @Delete(':id')
   async remove(@Param('id') id: string) {
-    if (isNaN(+id)) throw new HttpException('ID must be a number', HttpStatus.BAD_REQUEST);
+    if (isNaN(+id) || +id < 1 || Math.floor(+id)!==+id) throw new HttpException('ID must be a positive integer', HttpStatus.BAD_REQUEST);
     const userFound = await this.usersService.findOneById(+id);
     if (!userFound) throw new HttpException('User not found', HttpStatus.NOT_FOUND);
     if (!userFound.isActive) throw new HttpException('User allready deleted', HttpStatus.NOT_FOUND);

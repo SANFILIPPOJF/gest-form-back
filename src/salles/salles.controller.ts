@@ -28,7 +28,7 @@ export class SallesController {
 
   @Patch(':id')
   async update(@Param('id') id: string, @Body() updateSalleDto: UpdateSalleDto) {
-    if (isNaN(+id)) throw new HttpException('ID must be a number', HttpStatus.BAD_REQUEST);
+    if (isNaN(+id) || +id < 1 || Math.floor(+id)!==+id) throw new HttpException('ID must be a positive integer', HttpStatus.BAD_REQUEST);
     if (!updateSalleDto.adresse && !updateSalleDto.capacite && !updateSalleDto.name)
       throw new HttpException('nothing to update', HttpStatus.BAD_REQUEST);
     const salleFound = await this.sallesService.findOne(+id);
@@ -39,7 +39,7 @@ export class SallesController {
 
   @Delete(':id')
   async remove(@Param('id') id: string) {
-    if (isNaN(+id)) throw new HttpException('ID must be a number', HttpStatus.BAD_REQUEST);
+    if (isNaN(+id) || +id < 1 || Math.floor(+id)!==+id) throw new HttpException('ID must be a positive integer', HttpStatus.BAD_REQUEST);
     const salleFound = await this.sallesService.findOne(+id);
     if (!salleFound) throw new HttpException('salle not found', HttpStatus.NOT_FOUND);
     if (!salleFound.isActive) throw new HttpException('salle already deleted', HttpStatus.BAD_REQUEST);
