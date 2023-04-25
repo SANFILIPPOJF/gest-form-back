@@ -9,7 +9,7 @@ import { TransformInterceptor } from 'src/interceptor/TransformInterceptor';
 @UseInterceptors(TransformInterceptor) // transforme toutes les responses avec statusCode, status et data
 @ApiTags('SALLES') // cree une categorie SALLES dans swagger UI
 export class SallesController {
-  constructor(private readonly sallesService: SallesService) { }
+  constructor(private readonly sallesService: SallesService) {}
 
   @Post()
   async create(@Body() createSalleDto: CreateSalleDto) {

@@ -12,11 +12,14 @@ export class Formation extends BaseEntity {
     @Column()
     date: Date;
 
+    @Column( {nullable: true} )
+    heure: String;
+
     @Column({ default: 0 })
     status: number;
 
+    @Column( { nullable:true , default:"" } )
     @IsString()
-    @IsNotEmpty()
     motifAnnulation: string;
 
     @ManyToOne(() => FormationType, (formationType) => formationType.formations, {nullable : true})
