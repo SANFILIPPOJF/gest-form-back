@@ -13,9 +13,9 @@ export class ResidencesController {
   @Post()
   async create(@Body() residenceDto: ResidenceDto) {
     const sameResidence = await this.residencesService.findOneByName(residenceDto.name);
-    if (!sameResidence) return this.residencesService.create(residenceDto);
-    if (sameResidence.isActive) throw new HttpException('Salle allready exist', HttpStatus.CONFLICT);
-    return this.residencesService.active(sameResidence);
+    if (!sameResidence) return await this.residencesService.create(residenceDto);
+    if (sameResidence.isActive) throw new HttpException('Residence allready exist', HttpStatus.CONFLICT);
+    return await this.residencesService.active(sameResidence);
   }
 
   @Get()
@@ -27,18 +27,28 @@ export class ResidencesController {
 
   @Patch(':id')
   async update(@Param('id') id: string, @Body() residenceDto: ResidenceDto) {
+    if (isNaN(+id) || +id < 1 || Math.floor(+id) !== +id) throw new HttpException('ID must be a positive integer', HttpStatus.BAD_REQUEST);
     const residenceFound = await this.residencesService.findOne(+id);
     if (!residenceFound) throw new HttpException('residence not found', HttpStatus.NOT_FOUND);
     if (!residenceFound.isActive) throw new HttpException('residence deleted', HttpStatus.NOT_FOUND);
-    return this.residencesService.update(residenceFound, residenceDto);
+    
+    const sameResidence = await this.residencesService.findOneByName(residenceDto.name);
+    if (sameResidence) {
+      if (sameResidence.isActive)
+        throw new HttpException('Residence allready exist', HttpStatus.CONFLICT);
+        await this.residencesService.remove(residenceFound);
+        return await this.residencesService.active(sameResidence);
+    }
+    return await this.residencesService.update(residenceFound, residenceDto);
   }
 
   @Delete(':id')
   async remove(@Param('id') id: string) {
-    if (isNaN(+id) || +id < 1 || Math.floor(+id) !== +id) throw new HttpException('ID must be a positive integer', HttpStatus.BAD_REQUEST);
+    if (isNaN(+id) || +id < 1 || Math.floor(+id) !== +id)
+      throw new HttpException('ID must be a positive integer', HttpStatus.BAD_REQUEST);
     const residenceFound = await this.residencesService.findOne(+id);
     if (!residenceFound) throw new HttpException('residence not found', HttpStatus.NOT_FOUND);
     if (!residenceFound.isActive) throw new HttpException('residence already deleted', HttpStatus.BAD_REQUEST);
-    return this.residencesService.remove(residenceFound);
+    return await this.residencesService.remove(residenceFound);
   }
 }
