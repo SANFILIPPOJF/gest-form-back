@@ -10,6 +10,7 @@ import { FormationTypesService } from 'src/formation-types/formation-types.servi
 @Controller('habilitations')
 @UseInterceptors(TransformInterceptor) // transforme toutes les responses avec statusCode, status et data
 @ApiTags('HABILITATIONS') // cree une categorie HABILITATIONS dans swagger UI
+
 export class HabilitationsController {
   constructor(private readonly habilitationsService: HabilitationsService,
     private readonly usersService: UsersService,
@@ -28,11 +29,13 @@ export class HabilitationsController {
     if (new Date(createHabilitationDto.date) < new Date(Date.now()))
       throw new HttpException('Date already past', HttpStatus.BAD_REQUEST);
 
-    const user = this.usersService.findOneById(userId);
+    const user = await this.usersService.findOneById(userId);
     if (!user) throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+    if (!user.isActive) throw new HttpException('User deleted', HttpStatus.NOT_FOUND);
 
-    const formationType = this.formationTypesService.findOne(formationTypeId);
+    const formationType = await this.formationTypesService.findOne(formationTypeId);
     if (!formationType) throw new HttpException('formationType not found', HttpStatus.NOT_FOUND);
+    if (!formationType.isActive) throw new HttpException('FormationType deleted', HttpStatus.NOT_FOUND);
 
     const sameHabilitation = await this.habilitationsService.findOneByIds(userId, formationTypeId);
     if (sameHabilitation) throw new HttpException('habilitation allready exist', HttpStatus.CONFLICT);
@@ -41,11 +44,12 @@ export class HabilitationsController {
   }
 
   @Get(':id')
-  async findAllByUser(@Param('id') id: string) {
+  async getAllByUser(@Param('id') id: string) {
     if (isNaN(+id) || +id < 1 || Math.floor(+id) !== +id) throw new HttpException('ID must be a positive integer', HttpStatus.BAD_REQUEST);
 
     const user = await this.usersService.findOneById(+id);
     if (!user) throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+    if (!user.isActive) throw new HttpException('User deleted', HttpStatus.NOT_FOUND);
 
     const habilitations = await this.habilitationsService.findAllByUser(+id);
     if (habilitations.length === 0) throw new HttpException('No habilitation found', HttpStatus.NOT_FOUND);
@@ -64,7 +68,7 @@ export class HabilitationsController {
     const habilitationFound = await this.habilitationsService.findOne(+id);
     if (!habilitationFound) throw new HttpException('habilitation not found', HttpStatus.NOT_FOUND);
 
-    return this.habilitationsService.update(habilitationFound, updateHabilitationDto.date);
+    return await this.habilitationsService.update(habilitationFound, updateHabilitationDto.date);
   }
 
   @Delete(':id')
@@ -76,6 +80,6 @@ export class HabilitationsController {
     if (!habilitationFound)
       throw new HttpException('habilitation not found', HttpStatus.NOT_FOUND);
 
-    return this.habilitationsService.remove(habilitationFound);
+    return await this.habilitationsService.remove(habilitationFound);
   }
 }

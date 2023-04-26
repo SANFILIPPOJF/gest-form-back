@@ -7,7 +7,7 @@ export class Habilitation extends BaseEntity {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Column()
+    @Column({type:'timestamp with time zone'})
     date: Date;
 
     @ManyToOne(() => User, (user) => user.habilitations, {nullable : true})

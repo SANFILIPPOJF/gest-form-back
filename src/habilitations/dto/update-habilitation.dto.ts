@@ -1,9 +1,7 @@
-import { PartialType } from '@nestjs/swagger';
-import { CreateHabilitationDto } from './create-habilitation.dto';
-import { IsDate, IsNotEmpty } from 'class-validator';
+import {  IsDateString, IsNotEmpty } from 'class-validator';
 
-export class UpdateHabilitationDto extends PartialType(CreateHabilitationDto) {
-    @IsDate()
+export class UpdateHabilitationDto {
+    @IsDateString()
     @IsNotEmpty()
     date: Date;
 }
