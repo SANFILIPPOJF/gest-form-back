@@ -4,7 +4,7 @@ import { Habilitation } from "src/habilitations/entities/habilitation.entity";
 import { User } from "src/users/entities/user.entity";
 import { BaseEntity, Column, Entity, ManyToMany, PrimaryGeneratedColumn,JoinTable, OneToMany } from "typeorm";
 
-@Entity('formationTypes')
+@Entity('formation_types')
 export class FormationType extends BaseEntity{
     @PrimaryGeneratedColumn()
     id: number;
