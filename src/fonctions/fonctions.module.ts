@@ -4,6 +4,7 @@ import { FonctionsController } from './fonctions.controller';
 
 @Module({
   controllers: [FonctionsController],
-  providers: [FonctionsService]
+  providers: [FonctionsService],
+  exports: [FonctionsService]
 })
 export class FonctionsModule {}

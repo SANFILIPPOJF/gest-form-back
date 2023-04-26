@@ -5,6 +5,8 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { TransformInterceptor } from 'src/interceptor/TransformInterceptor';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import * as bcrypt from 'bcrypt';
+import { ResidencesService } from 'src/residences/residences.service';
+import { FonctionsService } from 'src/fonctions/fonctions.service';
 
 
 @Controller('users')
@@ -12,20 +14,31 @@ import * as bcrypt from 'bcrypt';
 @UseInterceptors(TransformInterceptor) // transforme toutes les responses avec statusCode, status et data
 @ApiTags('USERS') // cree une categorie USERS dans swagger UI
 export class UsersController {
-  constructor(private readonly usersService: UsersService) { }
+  constructor(private readonly usersService: UsersService,
+    private readonly residencesService: ResidencesService,
+    private readonly fonctionsService: FonctionsService
+  ) {}
 
   @Post()
   async create(@Body() createUserDto: CreateUserDto) {
-    if (createUserDto.password != createUserDto.passwordConfirm) {
+    const { cp, password, passwordConfirm, residenceId } = createUserDto
+    if (password != passwordConfirm)
       throw new HttpException('Uncorrect password confirmation', HttpStatus.BAD_REQUEST);
-    }
-    const userTest = await this.usersService.findOneByCp(createUserDto.cp);
-    createUserDto.password = await bcrypt.hash(createUserDto.password, 10)
-    if (!userTest) {
-      return await this.usersService.create(createUserDto);
-    }
-    if (userTest.isActive) throw new HttpException('User allready exist', HttpStatus.CONFLICT);
-    return await this.usersService.active(userTest,createUserDto);
+
+    const residenceFound = await this.residencesService.findOne(residenceId);
+    if (!residenceFound || !residenceFound.isActive)
+      throw new HttpException('residence not found', HttpStatus.NOT_FOUND);
+
+    const fonctionFound = await this.fonctionsService.findOne(residenceId);
+    if (!fonctionFound || !fonctionFound.isActive)
+      throw new HttpException('residence not found', HttpStatus.NOT_FOUND);
+
+    const userFound = await this.usersService.findOneByCp(cp);
+    createUserDto.password = await bcrypt.hash(password, 10)
+    if (!userFound) return await this.usersService.create(createUserDto);
+    if (userFound.isActive) throw new HttpException('User allready exist', HttpStatus.CONFLICT);
+
+    return await this.usersService.active(userFound, createUserDto);
   }
 
   @Get('cp/:cp')
@@ -39,7 +52,7 @@ export class UsersController {
 
   @Get(':id')
   async findOneById(@Param('id') id: string) {
-    if (isNaN(+id) || +id < 1 || Math.floor(+id)!==+id) throw new HttpException('ID must be a positive integer', HttpStatus.BAD_REQUEST);
+    if (isNaN(+id) || +id < 1 || Math.floor(+id) !== +id) throw new HttpException('ID must be a positive integer', HttpStatus.BAD_REQUEST);
     const userFound = await this.usersService.findOneById(+id);
     if (!userFound) throw new HttpException('User not found', HttpStatus.NOT_FOUND);
     if (!userFound.isActive) throw new HttpException('User deleted', HttpStatus.NOT_FOUND);
@@ -48,7 +61,7 @@ export class UsersController {
 
   @Patch(':id')
   async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    if (isNaN(+id) || +id < 1 || Math.floor(+id)!==+id) throw new HttpException('ID must be a positive integer', HttpStatus.BAD_REQUEST);
+    if (isNaN(+id) || +id < 1 || Math.floor(+id) !== +id) throw new HttpException('ID must be a positive integer', HttpStatus.BAD_REQUEST);
     const userFound = await this.usersService.findOneById(+id);
     if (!userFound) throw new HttpException('User not found', HttpStatus.NOT_FOUND);
     if (!userFound.isActive) throw new HttpException('User deleted', HttpStatus.NOT_FOUND);
@@ -58,7 +71,7 @@ export class UsersController {
 
   @Delete(':id')
   async remove(@Param('id') id: string) {
-    if (isNaN(+id) || +id < 1 || Math.floor(+id)!==+id) throw new HttpException('ID must be a positive integer', HttpStatus.BAD_REQUEST);
+    if (isNaN(+id) || +id < 1 || Math.floor(+id) !== +id) throw new HttpException('ID must be a positive integer', HttpStatus.BAD_REQUEST);
     const userFound = await this.usersService.findOneById(+id);
     if (!userFound) throw new HttpException('User not found', HttpStatus.NOT_FOUND);
     if (!userFound.isActive) throw new HttpException('User allready deleted', HttpStatus.NOT_FOUND);

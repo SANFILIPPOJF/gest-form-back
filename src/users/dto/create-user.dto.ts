@@ -20,4 +20,9 @@ export class CreateUserDto {
     @IsInt()
     @IsPositive()
     residenceId: number
+
+    @IsInt()
+    @IsPositive()
+    fonctionId: number
 }
+
