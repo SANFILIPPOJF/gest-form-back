@@ -1,26 +1,65 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { CreateHabilitationDto } from './dto/create-habilitation.dto';
-import { UpdateHabilitationDto } from './dto/update-habilitation.dto';
+import { Habilitation } from './entities/habilitation.entity';
+
 
 @Injectable()
 export class HabilitationsService {
-  create(createHabilitationDto: CreateHabilitationDto) {
-    return 'This action adds a new habilitation';
+  async create(createHabilitationDto: CreateHabilitationDto) {
+    try {
+      return await Habilitation.create({ ...createHabilitationDto }).save();
+    } catch (error) {
+      throw new InternalServerErrorException();
+    }
   }
 
-  findAll() {
-    return `This action returns all habilitations`;
+  async findAllByUser(userId: number) {
+    try {
+      return await Habilitation.find({
+        where: {
+          user: { id: userId }
+        }
+      });
+    } catch (error) {
+      throw new InternalServerErrorException();
+    }
+  }
+  
+  async findOne(id: number) {
+    try {
+      return await Habilitation.findOneBy({id});
+    } catch (error) {
+      throw new InternalServerErrorException();
+    }
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} habilitation`;
+  async findOneByIds(userId: number, formationTypeId: number) {
+    try {
+      return await Habilitation.findOne({
+        where: {
+          user: { id: userId },
+          formationType: { id: formationTypeId }
+        }
+      });
+    } catch (error) {
+      throw new InternalServerErrorException();
+    }
   }
 
-  update(id: number, updateHabilitationDto: UpdateHabilitationDto) {
-    return `This action updates a #${id} habilitation`;
+  async update(habilitation: Habilitation, date: Date) {
+    try {
+      habilitation.date=date;
+      return await habilitation.save()
+    } catch (error) {
+      throw new InternalServerErrorException();
+    }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} habilitation`;
+  async remove(habilitation: Habilitation) {
+    try {
+      return await habilitation.remove();
+    } catch (error) {
+      throw new InternalServerErrorException();
+    }
   }
 }

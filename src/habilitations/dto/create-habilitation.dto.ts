@@ -4,9 +4,10 @@ import { User } from "src/users/entities/user.entity";
 
 export class CreateHabilitationDto {
     @IsDate()
+    @IsNotEmpty()
     date: Date;
     @IsNotEmpty()
-    user: User;
+    userId: number;
     @IsNotEmpty()
-    formationType: FormationType;
+    formationTypeId: number;
 }
