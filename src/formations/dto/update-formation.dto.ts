@@ -1,11 +1,11 @@
 import { PartialType } from '@nestjs/swagger';
 import { CreateFormationDto } from './create-formation.dto';
-import { IsDate, IsOptional, IsString } from 'class-validator';
+import { IsDateString, IsOptional, IsString } from 'class-validator';
 
 export class UpdateFormationDto extends PartialType(CreateFormationDto) {
 
     @IsOptional()
-    @IsDate()
+    @IsDateString()
     date: Date;
 
     @IsOptional()

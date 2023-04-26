@@ -48,12 +48,20 @@ export class FormationsService {
       throw new InternalServerErrorException();
     }
   }
-  
+
   async cancel(formation: Formation, motif: string) {
     try {
       formation.motifAnnulation=motif;
       formation.status=STATUS.CANCELLED;
       return await formation.save();
+    } catch (error) {
+      throw new InternalServerErrorException();
+    }
+  }
+
+  async delete(formation: Formation) {
+    try {
+      return await formation.remove();
     } catch (error) {
       throw new InternalServerErrorException();
     }

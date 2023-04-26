@@ -9,7 +9,7 @@ export class Formation extends BaseEntity {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Column()
+    @Column({type:'timestamp with time zone'})
     date: Date;
 
     @Column( {nullable: true} )

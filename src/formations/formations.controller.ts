@@ -15,7 +15,7 @@ export class FormationsController {
 
   @Post()
   async create(@Body() createFormationDto: CreateFormationDto) {
-    if (Number(createFormationDto.date) < Date.now())
+    if (new Date(createFormationDto.date) < new Date(Date.now()))
       throw new HttpException('Date already past', HttpStatus.BAD_REQUEST);
     return await this.formationsService.create(createFormationDto);
   }
@@ -33,7 +33,7 @@ export class FormationsController {
     if (isNaN(+id) || +id < 1 || Math.floor(+id) !== +id) throw new HttpException('ID must be a positive integer', HttpStatus.BAD_REQUEST);
     if (!date && !heure)
       throw new HttpException('nothing to update', HttpStatus.BAD_REQUEST);
-    if (date && (Number(date) < Date.now()))
+    if (date && (new Date(updateFormationDto.date) < new Date(Date.now())))
       throw new HttpException('Date already past', HttpStatus.BAD_REQUEST);
     const formationFound = await this.formationsService.findOne(+id);
     if (!formationFound) throw new HttpException('Formation not found', HttpStatus.NOT_FOUND);
@@ -66,7 +66,7 @@ export class FormationsController {
     return await this.formationsService.updateStatus(formationFound,STATUS.REALIZED);
   }
 
-  @Delete(':id')
+  @Delete('cancel/:id')
   async cancel(@Param('id') id: string, @Body() cancelFormationDto: CancelFormationDto) {
     if (isNaN(+id) || +id < 1 || Math.floor(+id) !== +id)
       throw new HttpException('ID must be a positive integer', HttpStatus.BAD_REQUEST);
@@ -77,4 +77,17 @@ export class FormationsController {
     return await this.formationsService.cancel(formationFound,cancelFormationDto.motifAnnulation);
   }
 
+  @Delete(':id')
+  async delete(@Param('id') id: string) {
+    if (isNaN(+id) || +id < 1 || Math.floor(+id) !== +id)
+      throw new HttpException('ID must be a positive integer', HttpStatus.BAD_REQUEST);
+    const formationFound = await this.formationsService.findOne(+id);
+    if (!formationFound) throw new HttpException('Formation not found', HttpStatus.NOT_FOUND);
+    if (formationFound.status>STATUS.CREATED)
+      throw new HttpException('Impossible to delete because of formation status', HttpStatus.FORBIDDEN);
+    const responce = await this.formationsService.delete(formationFound);
+    console.log(responce);
+    
+    return responce
+  }
 }
