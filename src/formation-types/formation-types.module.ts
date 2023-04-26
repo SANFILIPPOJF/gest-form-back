@@ -4,6 +4,7 @@ import { FormationTypesController } from './formation-types.controller';
 
 @Module({
   controllers: [FormationTypesController],
-  providers: [FormationTypesService]
+  providers: [FormationTypesService],
+  exports: [FormationTypesService]
 })
 export class FormationTypesModule {}
