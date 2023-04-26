@@ -27,6 +27,7 @@ export class FonctionsController {
 
   @Patch(':id')
   async update(@Param('id') id: string, @Body() fonctionDto: FonctionDto) {
+    if (isNaN(+id) || +id < 1 || Math.floor(+id) !== +id) throw new HttpException('ID must be a positive integer', HttpStatus.BAD_REQUEST);
     const fonctionFound = await this.fonctionsService.findOne(+id);
     if (!fonctionFound) throw new HttpException('fonction not found', HttpStatus.NOT_FOUND);
     if (!fonctionFound.isActive) throw new HttpException('fonction deleted', HttpStatus.NOT_FOUND);
