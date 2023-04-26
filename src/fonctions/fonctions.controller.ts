@@ -13,9 +13,9 @@ export class FonctionsController {
   @Post()
   async create(@Body() fonctionDto: FonctionDto) {
   const sameFonction = await this.fonctionsService.findOneByName(fonctionDto.name);
-  if (!sameFonction) return this.fonctionsService.create(fonctionDto);
+  if (!sameFonction) return await this.fonctionsService.create(fonctionDto);
   if (sameFonction.isActive) throw new HttpException('Salle allready exist', HttpStatus.CONFLICT);
-  return this.fonctionsService.active(sameFonction);
+  return await this.fonctionsService.active(sameFonction);
   }
 
   @Get()
@@ -31,7 +31,7 @@ export class FonctionsController {
     const fonctionFound = await this.fonctionsService.findOne(+id);
     if (!fonctionFound) throw new HttpException('fonction not found', HttpStatus.NOT_FOUND);
     if (!fonctionFound.isActive) throw new HttpException('fonction deleted', HttpStatus.NOT_FOUND);
-    return this.fonctionsService.update(fonctionFound, fonctionDto);
+    return await this.fonctionsService.update(fonctionFound, fonctionDto);
   }
 
   @Delete(':id')
@@ -40,6 +40,6 @@ export class FonctionsController {
     const fonctionFound = await this.fonctionsService.findOne(+id);
     if (!fonctionFound) throw new HttpException('fonction not found', HttpStatus.NOT_FOUND);
     if (!fonctionFound.isActive) throw new HttpException('fonction already deleted', HttpStatus.BAD_REQUEST);
-    return this.fonctionsService.remove(fonctionFound);
+    return await this.fonctionsService.remove(fonctionFound);
   }
 }

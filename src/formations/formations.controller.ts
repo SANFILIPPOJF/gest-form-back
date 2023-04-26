@@ -29,28 +29,33 @@ export class FormationsController {
 
   @Patch(':id')
   async update(@Param('id') id: string, @Body() updateFormationDto: UpdateFormationDto) {
-    const { date, heure } = updateFormationDto
-    if (isNaN(+id) || +id < 1 || Math.floor(+id) !== +id) throw new HttpException('ID must be a positive integer', HttpStatus.BAD_REQUEST);
+    if (isNaN(+id) || +id < 1 || Math.floor(+id) !== +id)
+      throw new HttpException('ID must be a positive integer', HttpStatus.BAD_REQUEST);
+
+    const { date, heure } = updateFormationDto;
     if (!date && !heure)
       throw new HttpException('nothing to update', HttpStatus.BAD_REQUEST);
     if (date && (new Date(updateFormationDto.date) < new Date(Date.now())))
       throw new HttpException('Date already past', HttpStatus.BAD_REQUEST);
+
     const formationFound = await this.formationsService.findOne(+id);
     if (!formationFound) throw new HttpException('Formation not found', HttpStatus.NOT_FOUND);
     if (formationFound.status === STATUS.REALIZED) throw new HttpException('Formation already realized', HttpStatus.BAD_REQUEST);
     if (formationFound.status === STATUS.CANCELLED) throw new HttpException('Formation already cancelled', HttpStatus.BAD_REQUEST);
-    return this.formationsService.update(formationFound, updateFormationDto);
+    return await this.formationsService.update(formationFound, updateFormationDto);
   }
 
   @Patch('valid/:id')
   async valid(@Param('id') id: string) {
     if (isNaN(+id) || +id < 1 || Math.floor(+id) !== +id)
       throw new HttpException('ID must be a positive integer', HttpStatus.BAD_REQUEST);
+      
     const formationFound = await this.formationsService.findOne(+id);
     if (!formationFound) throw new HttpException('Formation not found', HttpStatus.NOT_FOUND);
     if (formationFound.status === STATUS.VALIDATED) throw new HttpException('Formation already validated', HttpStatus.BAD_REQUEST);
     if (formationFound.status === STATUS.REALIZED) throw new HttpException('Formation realized', HttpStatus.BAD_REQUEST);
     if (formationFound.status === STATUS.CANCELLED) throw new HttpException('Formation cancelled', HttpStatus.BAD_REQUEST);
+
     return await this.formationsService.updateStatus(formationFound,STATUS.VALIDATED);
   }
 
@@ -59,10 +64,12 @@ export class FormationsController {
     if (isNaN(+id) || +id < 1 || Math.floor(+id) !== +id)
       throw new HttpException('ID must be a positive integer', HttpStatus.BAD_REQUEST);
     const formationFound = await this.formationsService.findOne(+id);
+
     if (!formationFound) throw new HttpException('Formation not found', HttpStatus.NOT_FOUND);
     if (formationFound.status === STATUS.CREATED) throw new HttpException('Formation not validated', HttpStatus.BAD_REQUEST);
     if (formationFound.status === STATUS.REALIZED) throw new HttpException('Formation already realized', HttpStatus.BAD_REQUEST);
     if (formationFound.status === STATUS.CANCELLED) throw new HttpException('Formation cancelled', HttpStatus.BAD_REQUEST);
+
     return await this.formationsService.updateStatus(formationFound,STATUS.REALIZED);
   }
 
@@ -70,10 +77,12 @@ export class FormationsController {
   async cancel(@Param('id') id: string, @Body() cancelFormationDto: CancelFormationDto) {
     if (isNaN(+id) || +id < 1 || Math.floor(+id) !== +id)
       throw new HttpException('ID must be a positive integer', HttpStatus.BAD_REQUEST);
+
     const formationFound = await this.formationsService.findOne(+id);
     if (!formationFound) throw new HttpException('Formation not found', HttpStatus.NOT_FOUND);
     if (formationFound.status === STATUS.REALIZED) throw new HttpException('Formation realized', HttpStatus.BAD_REQUEST);
     if (formationFound.status === STATUS.CANCELLED) throw new HttpException('Formation already cancelled', HttpStatus.BAD_REQUEST);
+
     return await this.formationsService.cancel(formationFound,cancelFormationDto.motifAnnulation);
   }
 
@@ -81,13 +90,11 @@ export class FormationsController {
   async delete(@Param('id') id: string) {
     if (isNaN(+id) || +id < 1 || Math.floor(+id) !== +id)
       throw new HttpException('ID must be a positive integer', HttpStatus.BAD_REQUEST);
+
     const formationFound = await this.formationsService.findOne(+id);
     if (!formationFound) throw new HttpException('Formation not found', HttpStatus.NOT_FOUND);
     if (formationFound.status>STATUS.CREATED)
       throw new HttpException('Impossible to delete because of formation status', HttpStatus.FORBIDDEN);
-    const responce = await this.formationsService.delete(formationFound);
-    console.log(responce);
-    
-    return responce
+    return await this.formationsService.delete(formationFound);
   }
 }

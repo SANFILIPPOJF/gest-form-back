@@ -1,4 +1,4 @@
-import { IsInt, IsNotEmpty, IsString } from "class-validator";
+import { IsInt, IsNotEmpty, IsPositive, IsString } from "class-validator";
 
 export class CreateSalleDto {
     @IsString()
@@ -9,6 +9,7 @@ export class CreateSalleDto {
     @IsNotEmpty()
     adresse: string;
 
+    @IsPositive()
     @IsInt()
     capacite: number;
 }

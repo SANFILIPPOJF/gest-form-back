@@ -13,12 +13,11 @@ export class SallesController {
 
   @Post()
   async create(@Body() createSalleDto: CreateSalleDto) {
-    if (createSalleDto.capacite < 1 || Math.floor(createSalleDto.capacite) !== createSalleDto.capacite)
-      throw new HttpException('Capacite must be a positive integer', HttpStatus.BAD_REQUEST);
     const sameSalle = await this.sallesService.findOneByName(createSalleDto.name);
     if (!sameSalle) return this.sallesService.create(createSalleDto);
     if (sameSalle.isActive) throw new HttpException('Salle allready exist', HttpStatus.CONFLICT);
-    return this.sallesService.active(sameSalle, createSalleDto);
+
+    return await this.sallesService.active(sameSalle, createSalleDto);
   }
 
   @Get()
@@ -33,20 +32,22 @@ export class SallesController {
     if (isNaN(+id) || +id < 1 || Math.floor(+id) !== +id) throw new HttpException('ID must be a positive integer', HttpStatus.BAD_REQUEST);
     if (!updateSalleDto.adresse && !updateSalleDto.capacite && !updateSalleDto.name)
       throw new HttpException('nothing to update', HttpStatus.BAD_REQUEST);
-    if (updateSalleDto.capacite && (updateSalleDto.capacite < 1 || Math.floor(updateSalleDto.capacite) !== updateSalleDto.capacite))
-      throw new HttpException('Capacite must be a positive integer', HttpStatus.BAD_REQUEST);
+
     const salleFound = await this.sallesService.findOne(+id);
     if (!salleFound) throw new HttpException('salle not found', HttpStatus.NOT_FOUND);
     if (!salleFound.isActive) throw new HttpException('salle deleted', HttpStatus.NOT_FOUND);
-    return this.sallesService.update(salleFound, updateSalleDto);
+    
+    return await this.sallesService.update(salleFound, updateSalleDto);
   }
 
   @Delete(':id')
   async remove(@Param('id') id: string) {
     if (isNaN(+id) || +id < 1 || Math.floor(+id) !== +id) throw new HttpException('ID must be a positive integer', HttpStatus.BAD_REQUEST);
+
     const salleFound = await this.sallesService.findOne(+id);
     if (!salleFound) throw new HttpException('salle not found', HttpStatus.NOT_FOUND);
     if (!salleFound.isActive) throw new HttpException('salle already deleted', HttpStatus.BAD_REQUEST);
-    return this.sallesService.remove(salleFound);
+
+    return await this.sallesService.remove(salleFound);
   }
 }

@@ -20,12 +20,6 @@ export class HabilitationsController {
   async create(@Body() createHabilitationDto: CreateHabilitationDto) {
     const { userId, formationTypeId } = createHabilitationDto;
 
-    if (isNaN(userId) || userId < 1 || Math.floor(userId) !== userId)
-      throw new HttpException('user.ID must be a positive integer', HttpStatus.BAD_REQUEST);
-
-    if (isNaN(formationTypeId) || formationTypeId < 1 || Math.floor(formationTypeId) !== formationTypeId)
-      throw new HttpException('formationType.ID must be a positive integer', HttpStatus.BAD_REQUEST);
-
     if (new Date(createHabilitationDto.date) < new Date(Date.now()))
       throw new HttpException('Date already past', HttpStatus.BAD_REQUEST);
 
@@ -40,7 +34,7 @@ export class HabilitationsController {
     const sameHabilitation = await this.habilitationsService.findOneByIds(userId, formationTypeId);
     if (sameHabilitation) throw new HttpException('habilitation allready exist', HttpStatus.CONFLICT);
 
-    return this.habilitationsService.create(createHabilitationDto);
+    return await this.habilitationsService.create(createHabilitationDto);
   }
 
   @Get(':id')

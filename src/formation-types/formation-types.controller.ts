@@ -15,9 +15,9 @@ export class FormationTypesController {
   @Post()
   async create(@Body() createFormationTypeDto: CreateFormationTypeDto) {
     const sameFormType = await this.formationTypesService.findOneByName(createFormationTypeDto.name);
-    if (!sameFormType) return this.formationTypesService.create(createFormationTypeDto);
-    if (sameFormType.isActive) throw new HttpException('Formation Type allready exist', HttpStatus.CONFLICT);
-    return this.formationTypesService.active(sameFormType, createFormationTypeDto);
+    if (!sameFormType) return await this.formationTypesService.create(createFormationTypeDto);
+    if (sameFormType.isActive) throw new HttpException('Formation Type already exist', HttpStatus.CONFLICT);
+    return await this.formationTypesService.active(sameFormType, createFormationTypeDto);
   }
 
   @Get()
@@ -29,13 +29,17 @@ export class FormationTypesController {
 
   @Patch(':id')
   async update(@Param('id') id: string, @Body() updateFormationTypeDto: UpdateFormationTypeDto) {
-    if (isNaN(+id) || +id < 1 || Math.floor(+id)!==+id) throw new HttpException('ID must be a positive integer', HttpStatus.BAD_REQUEST);
+    if (isNaN(+id) || +id < 1 || Math.floor(+id)!==+id)
+      throw new HttpException('ID must be a positive integer', HttpStatus.BAD_REQUEST);
+
     if (!updateFormationTypeDto.codeRAF && !updateFormationTypeDto.duree && !updateFormationTypeDto.name)
       throw new HttpException('nothing to update', HttpStatus.BAD_REQUEST);
+
     const formTypeFound = await this.formationTypesService.findOne(+id);
     if (!formTypeFound) throw new HttpException('Formation Type not found', HttpStatus.NOT_FOUND);
     if (!formTypeFound.isActive) throw new HttpException('Formation Type deleted', HttpStatus.NOT_FOUND);
-    return this.formationTypesService.update(formTypeFound, updateFormationTypeDto);
+
+    return await this.formationTypesService.update(formTypeFound, updateFormationTypeDto);
   }
 
   @Delete(':id')
@@ -44,6 +48,6 @@ export class FormationTypesController {
     const formTypeFound = await this.formationTypesService.findOne(+id);
     if (!formTypeFound) throw new HttpException('salle not found', HttpStatus.NOT_FOUND);
     if (!formTypeFound.isActive) throw new HttpException('salle already deleted', HttpStatus.BAD_REQUEST);
-    return this.formationTypesService.remove(formTypeFound);
+    return await this.formationTypesService.remove(formTypeFound);
   }
 }
