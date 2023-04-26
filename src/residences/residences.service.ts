@@ -1,25 +1,62 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { ResidenceDto } from './dto/residence.dto';
+import { Residence } from './entities/residence.entity';
 
 @Injectable()
 export class ResidencesService {
-  create(ResidenceDto: ResidenceDto) {
-    return 'This action adds a new residence';
+  async create(residenceDto: ResidenceDto) {
+    try {
+      return await Residence.create({ ...residenceDto }).save();
+    } catch (error) {
+      throw new InternalServerErrorException();
+    }
+  }
+  async active(residence: Residence) {
+    try {
+      residence.isActive = true;
+      return await residence.save();
+    } catch (error) {
+      throw new InternalServerErrorException();
+    }
+  }
+  async findAll() {
+    try {
+      return await Residence.findBy({ isActive: true });
+    } catch (error) {
+      throw new InternalServerErrorException();
+    }
   }
 
-  findAll() {
-    return `This action returns all residences`;
+  async findOne(id: number) {
+    try {
+      return await Residence.findOneBy({ id })
+    } catch (error) {
+      throw new InternalServerErrorException();
+    }
+  }
+  async findOneByName(name: string) {
+    try {
+      return await Residence.findOneBy({ name })
+    } catch (error) {
+      throw new InternalServerErrorException();
+    }
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} residence`;
+  async update(residence: Residence, residenceDto: ResidenceDto) {
+    try {
+      residence.name = residenceDto.name;
+      return await residence.save()
+    } catch (error) {
+      throw new InternalServerErrorException();
+    }
   }
 
-  update(id: number, ResidenceDto: ResidenceDto) {
-    return `This action updates a #${id} residence`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} residence`;
+  async remove(residence: Residence) {
+    try {
+      residence.isActive=false;
+      return await residence.save();
+    } catch (error) {
+      throw new InternalServerErrorException();
+    }
   }
 }
