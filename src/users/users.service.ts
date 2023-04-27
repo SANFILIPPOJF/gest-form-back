@@ -4,6 +4,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
 import { Residence } from 'src/residences/entities/residence.entity';
 import { Fonction } from 'src/fonctions/entities/fonction.entity';
+import { PasswordDto } from './dto/password.dto';
 
 @Injectable()
 export class UsersService {
@@ -34,13 +35,24 @@ export class UsersService {
       throw new InternalServerErrorException();
     }
   }
+
   async update(user:User, updateUserDto: UpdateUserDto, residence: Residence, fonction: Fonction) {
     try {
-      if (updateUserDto.cp) user.cp = updateUserDto.cp.toUpperCase();
       if (updateUserDto.name) user.name = updateUserDto.name;
-      if (updateUserDto.password) user.password = updateUserDto.password;
       if (residence) user.residence = residence;
       if (fonction) user.fonction = fonction;
+      await user.save();
+      delete user.password;
+      return user
+    }
+    catch (error) {
+      throw new InternalServerErrorException();
+    }
+  }
+
+  async updatePassword(user:User, passwordDto: PasswordDto) {
+    try {
+      user.password = passwordDto.password;
       await user.save();
       delete user.password;
       return user

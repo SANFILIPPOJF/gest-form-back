@@ -1,4 +1,4 @@
-import { Controller, Get, Post, ClassSerializerInterceptor, UseInterceptors, Body, Patch, Param, Delete, HttpException, HttpStatus, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, ClassSerializerInterceptor, UseInterceptors, Body, Patch, Param, Delete, HttpException, HttpStatus} from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -7,6 +7,7 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import * as bcrypt from 'bcrypt';
 import { ResidencesService } from 'src/residences/residences.service';
 import { FonctionsService } from 'src/fonctions/fonctions.service';
+import { PasswordDto } from './dto/password.dto';
 
 
 @Controller('users')
@@ -62,23 +63,34 @@ export class UsersController {
 
   @Patch(':id')
   async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    
+    const {residenceId,fonctionId } = updateUserDto;
     if (isNaN(+id) || +id < 1 || Math.floor(+id) !== +id) throw new HttpException('ID must be a positive integer', HttpStatus.BAD_REQUEST);
 
     const userFound = await this.usersService.findOneById(+id);
-    if (!userFound) throw new HttpException('User not found', HttpStatus.NOT_FOUND);
-    if (!userFound.isActive) throw new HttpException('User deleted', HttpStatus.NOT_FOUND);
-    userFound.password = await bcrypt.hash(updateUserDto.password, 10);
+    if (!userFound || !userFound.isActive) throw new HttpException('User not found', HttpStatus.NOT_FOUND);
 
-    const residenceFound = await this.residencesService.findOne(updateUserDto.residenceId);
-    if (updateUserDto.residenceId && (!residenceFound || !residenceFound.isActive))
+    const residenceFound = await this.residencesService.findOne(residenceId);
+    if (residenceId && (!residenceFound || !residenceFound.isActive))
       throw new HttpException('residence not found', HttpStatus.NOT_FOUND);
 
-    const fonctionFound = await this.fonctionsService.findOne(updateUserDto.fonctionId);
+    const fonctionFound = await this.fonctionsService.findOne(fonctionId);
     if (updateUserDto.fonctionId && (!fonctionFound || !fonctionFound.isActive))
       throw new HttpException('fonction not found', HttpStatus.NOT_FOUND);
 
     return await this.usersService.update(userFound, updateUserDto, residenceFound, fonctionFound);
+  }
+
+  @Patch('password/:id')
+  async updatePassword(@Param('id') id: string, @Body() passwordDto: PasswordDto) {
+    if (isNaN(+id) || +id < 1 || Math.floor(+id) !== +id) throw new HttpException('ID must be a positive integer', HttpStatus.BAD_REQUEST);
+    const {password, passwordConfirm} = passwordDto;
+    if (password != passwordConfirm)
+    throw new HttpException('Uncorrect password confirmation', HttpStatus.BAD_REQUEST);
+
+    const userFound = await this.usersService.findOneById(+id);
+    if (!userFound || !userFound.isActive) throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+    passwordDto.password = await bcrypt.hash(password, 10)
+    return await this.usersService.updatePassword(userFound,passwordDto);
   }
 
   @Delete(':id')
