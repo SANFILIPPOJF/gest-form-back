@@ -2,15 +2,15 @@ import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
+import { Residence } from 'src/residences/entities/residence.entity';
+import { Fonction } from 'src/fonctions/entities/fonction.entity';
 
 @Injectable()
 export class UsersService {
-  async create(createUserDto: CreateUserDto) {
-    const cp = createUserDto.cp.toUpperCase();
-    const password = createUserDto.password;
-    const name = createUserDto.name
+  async create(createUserDto: CreateUserDto, residence: Residence, fonction: Fonction) {
+    const {cp, password, name}= createUserDto;
     try {
-      return await User.create({ cp, password, name }).save();
+      return await User.create({cp, password, name, fonction, residence}).save();
     }
     catch (error) {
       throw new InternalServerErrorException();
@@ -34,11 +34,13 @@ export class UsersService {
       throw new InternalServerErrorException();
     }
   }
-  async update(user:User, updateUserDto: UpdateUserDto) {
+  async update(user:User, updateUserDto: UpdateUserDto, residence: Residence, fonction: Fonction) {
     try {
       if (updateUserDto.cp) user.cp = updateUserDto.cp.toUpperCase();
       if (updateUserDto.name) user.name = updateUserDto.name;
       if (updateUserDto.password) user.password = updateUserDto.password;
+      if (residence) user.residence = residence;
+      if (fonction) user.fonction = fonction;
       await user.save();
       delete user.password;
       return user
@@ -48,11 +50,13 @@ export class UsersService {
     }
   }
 
-  async active(user: User, createUserDto: CreateUserDto) {
+  async active(user: User, createUserDto: CreateUserDto, residence: Residence, fonction: Fonction) {
     try {
       user.name = createUserDto.name;
       user.password = createUserDto.password;
       user.isActive = true;
+      user.fonction = fonction;
+      user.residence = residence;
       await user.save();
       delete user.password;
       return user

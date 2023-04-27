@@ -12,4 +12,10 @@ export class UpdateUserDto extends PartialType(CreateUserDto) {
 
     @IsOptional()
     name: string
+
+    @IsOptional()
+    residenceId: number
+
+    @IsOptional()
+    fonctionId: number
 }
