@@ -11,4 +11,9 @@ export class CreateFormationDto {
     @IsPositive()
     @IsInt()
     formTypeId: number;
+
+    @IsOptional()
+    @IsPositive()
+    @IsInt()
+    salleId : number
 }

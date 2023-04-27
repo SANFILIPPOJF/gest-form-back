@@ -11,4 +11,6 @@ export class UpdateFormationDto extends PartialType(CreateFormationDto) {
 
     @IsOptional()
     formTypeId: number;
+
+    salleId : number
 }

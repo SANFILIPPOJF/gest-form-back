@@ -4,6 +4,7 @@ import { SallesController } from './salles.controller';
 
 @Module({
   controllers: [SallesController],
-  providers: [SallesService]
+  providers: [SallesService],
+  exports: [SallesService]
 })
 export class SallesModule {}

@@ -8,14 +8,17 @@ import { CancelFormationDto } from './dto/cancel-formation.dto';
 import { STATUS } from 'src/constants/formation-status';
 import { FormationTypesService } from 'src/formation-types/formation-types.service';
 import { FormationType } from 'src/formation-types/entities/formation-type.entity';
+import { Salle } from 'src/salles/entities/salle.entity';
+import { SallesService } from 'src/salles/salles.service';
 
 @Controller('formations')
 @UseInterceptors(TransformInterceptor) // transforme toutes les responses avec statusCode, status et data
 @ApiTags('FORMATIONS') // cree une categorie FORMATIONS dans swagger UI
 export class FormationsController {
   constructor(private readonly formationsService: FormationsService,
-    private readonly formationTypesService: FormationTypesService
-    ) { }
+    private readonly formationTypesService: FormationTypesService,
+    private readonly sallesService: SallesService
+  ) { }
 
   @Post()
   async create(@Body() createFormationDto: CreateFormationDto) {
@@ -27,7 +30,14 @@ export class FormationsController {
     if (!formTypeFound || !formTypeFound.isActive)
       throw new HttpException('Type formation not found', HttpStatus.NOT_FOUND);
 
-    return await this.formationsService.create(createFormationDto,formTypeFound);
+    let salleFound: Salle = null;
+    if (createFormationDto.salleId) {
+      salleFound = await this.sallesService.findOne(createFormationDto.salleId);
+      if (!salleFound || !salleFound.isActive)
+        throw new HttpException('salle not found', HttpStatus.NOT_FOUND);
+    }
+
+    return await this.formationsService.create(createFormationDto, formTypeFound, salleFound);
   }
 
   @Get()
@@ -42,7 +52,7 @@ export class FormationsController {
     if (isNaN(+id) || +id < 1 || Math.floor(+id) !== +id)
       throw new HttpException('ID must be a positive integer', HttpStatus.BAD_REQUEST);
 
-    const { date, heure, formTypeId } = updateFormationDto;
+    const { date, heure, formTypeId, salleId } = updateFormationDto;
     if (!date && !heure && !formTypeId)
       throw new HttpException('nothing to update', HttpStatus.BAD_REQUEST);
 
@@ -50,31 +60,37 @@ export class FormationsController {
       throw new HttpException('Date already past', HttpStatus.BAD_REQUEST);
 
     let formTypeFound: FormationType = null;
-    if (formTypeId){
+    if (formTypeId) {
       formTypeFound = await this.formationTypesService.findOne(formTypeId);
       if (!formTypeFound || !formTypeFound.isActive)
         throw new HttpException('Type formation not found', HttpStatus.NOT_FOUND);
+    }
+    let salleFound: Salle = null;
+    if (salleId) {
+      salleFound = await this.sallesService.findOne(salleId);
+      if (!salleFound || !salleFound.isActive)
+        throw new HttpException('salle not found', HttpStatus.NOT_FOUND);
     }
     const formationFound = await this.formationsService.findOne(+id);
     if (!formationFound) throw new HttpException('Formation not found', HttpStatus.NOT_FOUND);
     if (formationFound.status === STATUS.REALIZED) throw new HttpException('Formation already realized', HttpStatus.BAD_REQUEST);
     if (formationFound.status === STATUS.CANCELLED) throw new HttpException('Formation already cancelled', HttpStatus.BAD_REQUEST);
 
-    return await this.formationsService.update(formationFound, updateFormationDto, formTypeFound);
+    return await this.formationsService.update(formationFound, updateFormationDto, formTypeFound, salleFound);
   }
 
   @Patch('valid/:id')
   async valid(@Param('id') id: string) {
     if (isNaN(+id) || +id < 1 || Math.floor(+id) !== +id)
       throw new HttpException('ID must be a positive integer', HttpStatus.BAD_REQUEST);
-      
+
     const formationFound = await this.formationsService.findOne(+id);
     if (!formationFound) throw new HttpException('Formation not found', HttpStatus.NOT_FOUND);
     if (formationFound.status === STATUS.VALIDATED) throw new HttpException('Formation already validated', HttpStatus.BAD_REQUEST);
     if (formationFound.status === STATUS.REALIZED) throw new HttpException('Formation realized', HttpStatus.BAD_REQUEST);
     if (formationFound.status === STATUS.CANCELLED) throw new HttpException('Formation cancelled', HttpStatus.BAD_REQUEST);
 
-    return await this.formationsService.updateStatus(formationFound,STATUS.VALIDATED);
+    return await this.formationsService.updateStatus(formationFound, STATUS.VALIDATED);
   }
 
   @Patch('realize/:id')
@@ -88,7 +104,7 @@ export class FormationsController {
     if (formationFound.status === STATUS.REALIZED) throw new HttpException('Formation already realized', HttpStatus.BAD_REQUEST);
     if (formationFound.status === STATUS.CANCELLED) throw new HttpException('Formation cancelled', HttpStatus.BAD_REQUEST);
 
-    return await this.formationsService.updateStatus(formationFound,STATUS.REALIZED);
+    return await this.formationsService.updateStatus(formationFound, STATUS.REALIZED);
   }
 
   @Delete('cancel/:id')
@@ -101,7 +117,7 @@ export class FormationsController {
     if (formationFound.status === STATUS.REALIZED) throw new HttpException('Formation realized', HttpStatus.BAD_REQUEST);
     if (formationFound.status === STATUS.CANCELLED) throw new HttpException('Formation already cancelled', HttpStatus.BAD_REQUEST);
 
-    return await this.formationsService.cancel(formationFound,cancelFormationDto.motifAnnulation);
+    return await this.formationsService.cancel(formationFound, cancelFormationDto.motifAnnulation);
   }
 
   @Delete(':id')
@@ -111,7 +127,7 @@ export class FormationsController {
 
     const formationFound = await this.formationsService.findOne(+id);
     if (!formationFound) throw new HttpException('Formation not found', HttpStatus.NOT_FOUND);
-    if (formationFound.status>STATUS.CREATED)
+    if (formationFound.status > STATUS.CREATED)
       throw new HttpException('Impossible to delete because of formation status', HttpStatus.FORBIDDEN);
     return await this.formationsService.delete(formationFound);
   }
