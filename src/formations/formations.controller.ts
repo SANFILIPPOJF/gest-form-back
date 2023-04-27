@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors, HttpException, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors, HttpException, HttpStatus, ClassSerializerInterceptor } from '@nestjs/common';
 import { FormationsService } from './formations.service';
 import { CreateFormationDto } from './dto/create-formation.dto';
 import { UpdateFormationDto } from './dto/update-formation.dto';
@@ -10,14 +10,18 @@ import { FormationTypesService } from 'src/formation-types/formation-types.servi
 import { FormationType } from 'src/formation-types/entities/formation-type.entity';
 import { Salle } from 'src/salles/entities/salle.entity';
 import { SallesService } from 'src/salles/salles.service';
+import { ParticipantFormationDto } from './dto/participant-formationDto';
+import { UsersService } from 'src/users/users.service';
 
 @Controller('formations')
+@UseInterceptors(ClassSerializerInterceptor) // Ne renvoie pas les proprietes d'une entité marquées par @Exclude()
 @UseInterceptors(TransformInterceptor) // transforme toutes les responses avec statusCode, status et data
 @ApiTags('FORMATIONS') // cree une categorie FORMATIONS dans swagger UI
 export class FormationsController {
   constructor(private readonly formationsService: FormationsService,
     private readonly formationTypesService: FormationTypesService,
-    private readonly sallesService: SallesService
+    private readonly sallesService: SallesService,
+    private readonly usersService: UsersService
   ) { }
 
   @Post()
@@ -40,11 +44,33 @@ export class FormationsController {
     return await this.formationsService.create(createFormationDto, formTypeFound, salleFound);
   }
 
+  @Post('participant/:id')
+  async addParticipant (@Param('id') id: string, @Body() participantFormationDto: ParticipantFormationDto){
+    if (isNaN(+id) || +id < 1 || Math.floor(+id) !== +id)
+      throw new HttpException('ID must be a positive integer', HttpStatus.BAD_REQUEST);
+
+      const formationFound = await this.formationsService.findOne(+id);
+      console.log(formationFound);
+      
+      if (!formationFound) throw new HttpException('Formation not found', HttpStatus.NOT_FOUND);
+      if (formationFound.status === STATUS.REALIZED) throw new HttpException('Formation already realized', HttpStatus.BAD_REQUEST);
+      if (formationFound.status === STATUS.CANCELLED) throw new HttpException('Formation already cancelled', HttpStatus.BAD_REQUEST);
+
+      if (formationFound.participants && formationFound.participants.find(user => user.id === participantFormationDto.userId))
+        throw new HttpException('Participant already exist', HttpStatus.CONFLICT);
+
+      const participant = await this.usersService.findOneById(participantFormationDto.userId)
+      if (!participant || !participant.isActive) throw new HttpException('Participant not found', HttpStatus.NOT_FOUND);
+
+      formationFound.participants.push(participant);
+      return await formationFound.save();
+  }
+
   @Get()
   async findAll() {
     const formations = await this.formationsService.findAll();
     if (formations.length === 0) throw new HttpException('No formation found', HttpStatus.NOT_FOUND);
-    return formations
+    return formations;
   }
 
   @Patch(':id')

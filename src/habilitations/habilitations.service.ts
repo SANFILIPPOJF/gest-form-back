@@ -40,7 +40,6 @@ export class HabilitationsService {
     }
   }
   
-
   async findOne(id: number) {
     try {
       return await Habilitation.findOneBy({id});

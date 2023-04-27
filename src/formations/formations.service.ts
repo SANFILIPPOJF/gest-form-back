@@ -11,7 +11,8 @@ export class FormationsService {
   async create(createFormationDto: CreateFormationDto, formationType: FormationType, salle: Salle) {
     try {
       const {date,heure}= createFormationDto;
-      return await Formation.create({date,heure,formationType,salle}).save();
+      const participants=[];
+      return await Formation.create({date,heure,formationType,salle,participants}).save();
     } catch (error) {
       throw new InternalServerErrorException();
     }
@@ -27,7 +28,16 @@ export class FormationsService {
 
   async findOne(id: number) {
     try {
-      return await Formation.findOneBy({id})
+      return await Formation.findOne({where:{id},relations:{participants:true, formateurs:true}})
+    } catch (error) {
+      throw new InternalServerErrorException();
+    }
+  }
+
+  async findParticipants(id: number) {
+    try {
+      const formation = await Formation.findOneBy({id})
+      return formation.participants
     } catch (error) {
       throw new InternalServerErrorException();
     }
