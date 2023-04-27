@@ -1,4 +1,4 @@
-import { IsDateString, IsOptional, IsString } from "class-validator";
+import { IsDateString, IsInt, IsOptional, IsPositive, IsString } from "class-validator";
 
 export class CreateFormationDto {
     @IsDateString()
@@ -7,4 +7,8 @@ export class CreateFormationDto {
     @IsOptional()
     @IsString()
     heure: string;
+
+    @IsPositive()
+    @IsInt()
+    formTypeId: number;
 }

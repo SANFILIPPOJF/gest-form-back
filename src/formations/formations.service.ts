@@ -3,12 +3,14 @@ import { CreateFormationDto } from './dto/create-formation.dto';
 import { UpdateFormationDto } from './dto/update-formation.dto';
 import { Formation } from './entities/formation.entity';
 import { STATUS } from 'src/constants/formation-status';
+import { FormationType } from 'src/formation-types/entities/formation-type.entity';
 
 @Injectable()
 export class FormationsService {
-  async create(createFormationDto: CreateFormationDto) {
+  async create(createFormationDto: CreateFormationDto, formationType: FormationType) {
     try {
-      return await Formation.create({...createFormationDto}).save();
+      const {date,heure}= createFormationDto
+      return await Formation.create({date,heure,formationType}).save();
     } catch (error) {
       throw new InternalServerErrorException();
     }
@@ -30,10 +32,11 @@ export class FormationsService {
     }
   }
 
-  async update(formation: Formation, updateFormationDto: UpdateFormationDto) {
+  async update(formation: Formation, updateFormationDto: UpdateFormationDto, formationType?: FormationType ) {
     try {
       if (updateFormationDto.date) formation.date=updateFormationDto.date;
       if (updateFormationDto.heure) formation.heure=updateFormationDto.heure;
+      if (formationType) formation.formationType=formationType;
       return await formation.save()
     } catch (error) {
       throw new InternalServerErrorException();
