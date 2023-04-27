@@ -1,13 +1,16 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { CreateHabilitationDto } from './dto/create-habilitation.dto';
 import { Habilitation } from './entities/habilitation.entity';
+import { User } from 'src/users/entities/user.entity';
+import { FormationType } from 'src/formation-types/entities/formation-type.entity';
 
 
 @Injectable()
 export class HabilitationsService {
-  async create(createHabilitationDto: CreateHabilitationDto) {
+  async create(createHabilitationDto: CreateHabilitationDto, user: User, formationType: FormationType) {
+    const {date} = createHabilitationDto;
     try {
-      return await Habilitation.create({ ...createHabilitationDto }).save();
+      return await Habilitation.create({ date, user, formationType }).save();
     } catch (error) {
       throw new InternalServerErrorException();
     }
@@ -25,6 +28,19 @@ export class HabilitationsService {
     }
   }
   
+  async findAllByFormType(formTypeId: number) {
+    try {
+      return await Habilitation.find({
+        where: {
+          formationType: { id: formTypeId }
+        }
+      });
+    } catch (error) {
+      throw new InternalServerErrorException();
+    }
+  }
+  
+
   async findOne(id: number) {
     try {
       return await Habilitation.findOneBy({id});
