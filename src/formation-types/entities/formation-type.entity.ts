@@ -34,5 +34,8 @@ export class FormationType extends BaseEntity{
     concerne: Fonction[]
 
     @ManyToMany(() => User, (user) => user.habFormateurs, {nullable: true})
+    @JoinTable({
+        name: 'type_formateurs'
+    })
     formateurs: User[]
 }

@@ -12,8 +12,7 @@ export class UsersService {
   async create(createUserDto: CreateUserDto, residence: Residence, fonction: Fonction) {
     const {cp, password, name}= createUserDto;
     try {
-      const habFormateurs = [];
-      return await User.create({cp, password, name, fonction, residence, habFormateurs}).save();
+      return await User.create({cp, password, name, fonction, residence}).save();
     }
     catch (error) {
       throw new InternalServerErrorException();

@@ -2,17 +2,36 @@ import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { CreateFormationTypeDto } from './dto/create-formation-type.dto';
 import { UpdateFormationTypeDto } from './dto/update-formation-type.dto';
 import { FormationType } from './entities/formation-type.entity';
+import { User } from 'src/users/entities/user.entity';
 
 @Injectable()
 export class FormationTypesService {
   async create(createFormationTypeDto: CreateFormationTypeDto) {
     try {
-      return await FormationType.create({...createFormationTypeDto}).save();
+      const formateurs = [];
+      return await FormationType.create({...createFormationTypeDto,formateurs}).save();
+    } catch (error) {
+      throw new InternalServerErrorException();
+    }
+  }
+  
+  async addFormateur(formationType: FormationType, formateur: User) {
+    try {
+      formationType.formateurs.push(formateur);
+      return await formationType.save();
     } catch (error) {
       throw new InternalServerErrorException();
     }
   }
 
+  async removeFormateur(formationType: FormationType, formateurId: number){
+    try {
+      formationType.formateurs = formationType.formateurs.filter( user => user.id !== formateurId);
+      return formationType.save();
+    } catch (error) {
+      throw new InternalServerErrorException();
+    }
+  }
   async active(formationType: FormationType, createFormationTypeDto: CreateFormationTypeDto) {
     try {
       formationType.codeRAF = createFormationTypeDto.codeRAF;
@@ -33,7 +52,7 @@ export class FormationTypesService {
 
   findOne(id: number) {
     try {
-      return FormationType.findOneBy({id})
+      return FormationType.findOne({ where: { id }, relations: { formateurs: true } })
     } catch (error) {
       throw new InternalServerErrorException();
     }
