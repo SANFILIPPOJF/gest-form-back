@@ -10,7 +10,7 @@ import { FormationTypesService } from 'src/formation-types/formation-types.servi
 import { FormationType } from 'src/formation-types/entities/formation-type.entity';
 import { Salle } from 'src/salles/entities/salle.entity';
 import { SallesService } from 'src/salles/salles.service';
-import { ParticipantFormationDto } from './dto/participant-formationDto';
+import { AgentFormationDto } from './dto/agent-formationDto';
 import { UsersService } from 'src/users/users.service';
 
 @Controller('formations')
@@ -45,27 +45,73 @@ export class FormationsController {
   }
 
   @Post('participant/:id')
-  async addParticipant (@Param('id') id: string, @Body() participantFormationDto: ParticipantFormationDto){
+  async addParticipant(@Param('id') id: string, @Body() participantDto: AgentFormationDto) {
     if (isNaN(+id) || +id < 1 || Math.floor(+id) !== +id)
       throw new HttpException('ID must be a positive integer', HttpStatus.BAD_REQUEST);
 
-      const formationFound = await this.formationsService.findOne(+id);
-      console.log(formationFound);
-      
-      if (!formationFound) throw new HttpException('Formation not found', HttpStatus.NOT_FOUND);
-      if (formationFound.status === STATUS.REALIZED) throw new HttpException('Formation already realized', HttpStatus.BAD_REQUEST);
-      if (formationFound.status === STATUS.CANCELLED) throw new HttpException('Formation already cancelled', HttpStatus.BAD_REQUEST);
+    const formationFound = await this.formationsService.findOne(+id);
+    if (!formationFound) throw new HttpException('Formation not found', HttpStatus.NOT_FOUND);
+    if (formationFound.status === STATUS.REALIZED) throw new HttpException('Formation already realized', HttpStatus.BAD_REQUEST);
+    if (formationFound.status === STATUS.CANCELLED) throw new HttpException('Formation already cancelled', HttpStatus.BAD_REQUEST);
 
-      if (formationFound.participants && formationFound.participants.find(user => user.id === participantFormationDto.userId))
-        throw new HttpException('Participant already exist', HttpStatus.CONFLICT);
+    if (formationFound.participants.find(user => user.id === participantDto.userId))
+      throw new HttpException('Participant already exist', HttpStatus.CONFLICT);
 
-      const participant = await this.usersService.findOneById(participantFormationDto.userId)
-      if (!participant || !participant.isActive) throw new HttpException('Participant not found', HttpStatus.NOT_FOUND);
+    const participant = await this.usersService.findOneById(participantDto.userId)
+    if (!participant || !participant.isActive) throw new HttpException('Participant not found', HttpStatus.NOT_FOUND);
 
-      formationFound.participants.push(participant);
-      return await formationFound.save();
+    return await this.formationsService.addParticipant(formationFound,participant);
   }
 
+  @Delete('participant/:id')
+  async removeParticipant(@Param('id') id: string, @Body() participantDto: AgentFormationDto) {
+    if (isNaN(+id) || +id < 1 || Math.floor(+id) !== +id)
+      throw new HttpException('ID must be a positive integer', HttpStatus.BAD_REQUEST);
+
+    const formationFound = await this.formationsService.findOne(+id);
+    if (!formationFound) throw new HttpException('Formation not found', HttpStatus.NOT_FOUND);
+    if (formationFound.status === STATUS.REALIZED) throw new HttpException('Formation already realized', HttpStatus.BAD_REQUEST);
+    if (formationFound.status === STATUS.CANCELLED) throw new HttpException('Formation already cancelled', HttpStatus.BAD_REQUEST);
+
+    if (!formationFound.participants.find(user => user.id === participantDto.userId))
+      throw new HttpException('Participant not found', HttpStatus.NOT_FOUND);
+    
+    return await this.formationsService.removeParticipant(formationFound,participantDto.userId);
+  }
+  @Post('formateur/:id')
+  async addFormateur(@Param('id') id: string, @Body() formateurDto: AgentFormationDto) {
+    if (isNaN(+id) || +id < 1 || Math.floor(+id) !== +id)
+      throw new HttpException('ID must be a positive integer', HttpStatus.BAD_REQUEST);
+
+    const formationFound = await this.formationsService.findOne(+id);
+    if (!formationFound) throw new HttpException('Formation not found', HttpStatus.NOT_FOUND);
+    if (formationFound.status === STATUS.REALIZED) throw new HttpException('Formation already realized', HttpStatus.BAD_REQUEST);
+    if (formationFound.status === STATUS.CANCELLED) throw new HttpException('Formation already cancelled', HttpStatus.BAD_REQUEST);
+
+    if (formationFound.formateurs.find(user => user.id === formateurDto.userId))
+      throw new HttpException('formateur already exist', HttpStatus.CONFLICT);
+
+    const formateur = await this.usersService.findOneById(formateurDto.userId)
+    if (!formateur || !formateur.isActive) throw new HttpException('Formateur not found', HttpStatus.NOT_FOUND);
+
+    return await this.formationsService.addFormateur(formationFound,formateur);
+  }
+
+  @Delete('formateur/:id')
+  async removeFormateur(@Param('id') id: string, @Body() formateurDto: AgentFormationDto) {
+    if (isNaN(+id) || +id < 1 || Math.floor(+id) !== +id)
+      throw new HttpException('ID must be a positive integer', HttpStatus.BAD_REQUEST);
+
+    const formationFound = await this.formationsService.findOne(+id);
+    if (!formationFound) throw new HttpException('Formation not found', HttpStatus.NOT_FOUND);
+    if (formationFound.status === STATUS.REALIZED) throw new HttpException('Formation already realized', HttpStatus.BAD_REQUEST);
+    if (formationFound.status === STATUS.CANCELLED) throw new HttpException('Formation already cancelled', HttpStatus.BAD_REQUEST);
+
+    if (!formationFound.formateurs.find(user => user.id === formateurDto.userId))
+      throw new HttpException('formateur not found', HttpStatus.NOT_FOUND);
+    
+    return await this.formationsService.removeFormateur(formationFound,formateurDto.userId);
+  }
   @Get()
   async findAll() {
     const formations = await this.formationsService.findAll();

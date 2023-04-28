@@ -1,6 +1,6 @@
 import { IsInt, IsPositive, isNotEmpty } from 'class-validator';
 
-export class ParticipantFormationDto {
+export class AgentFormationDto {
 
     @IsInt()
     @IsPositive()

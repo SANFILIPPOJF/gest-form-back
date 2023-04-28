@@ -5,13 +5,15 @@ import { User } from './entities/user.entity';
 import { Residence } from 'src/residences/entities/residence.entity';
 import { Fonction } from 'src/fonctions/entities/fonction.entity';
 import { PasswordDto } from './dto/password.dto';
+import { FormationType } from 'src/formation-types/entities/formation-type.entity';
 
 @Injectable()
 export class UsersService {
   async create(createUserDto: CreateUserDto, residence: Residence, fonction: Fonction) {
     const {cp, password, name}= createUserDto;
     try {
-      return await User.create({cp, password, name, fonction, residence}).save();
+      const habFormateurs = [];
+      return await User.create({cp, password, name, fonction, residence, habFormateurs}).save();
     }
     catch (error) {
       throw new InternalServerErrorException();
