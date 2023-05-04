@@ -22,7 +22,7 @@ export class Formation extends BaseEntity {
     @IsString()
     motifAnnulation: string;
 
-    @ManyToOne(() => FormationType, (formationType) => formationType.formations, {nullable : true})
+    @ManyToOne(() => FormationType, (formationType) => formationType.formations, {nullable : true, eager: true })
     formationType: FormationType;
 
     @ManyToMany(() => User, (user) => user.formations, { nullable: true })
@@ -37,6 +37,6 @@ export class Formation extends BaseEntity {
     })
     formateurs: User[]
 
-    @ManyToOne(() => Salle, (salle) => salle.utilisations, {nullable : true})
+    @ManyToOne(() => Salle, (salle) => salle.utilisations, {nullable : true, eager: true})
     salle: Salle
 }

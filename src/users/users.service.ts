@@ -5,7 +5,6 @@ import { User } from './entities/user.entity';
 import { Residence } from 'src/residences/entities/residence.entity';
 import { Fonction } from 'src/fonctions/entities/fonction.entity';
 import { PasswordDto } from './dto/password.dto';
-import { FormationType } from 'src/formation-types/entities/formation-type.entity';
 
 @Injectable()
 export class UsersService {
@@ -25,7 +24,7 @@ export class UsersService {
         relations: { residence: true,
                     fonction: true,
                     habilitations: true,
-                    formations: true,
+                    formations : true,
                     forme: true,
                     habFormateurs:true} });
     }

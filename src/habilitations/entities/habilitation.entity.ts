@@ -13,6 +13,6 @@ export class Habilitation extends BaseEntity {
     @ManyToOne(() => User, (user) => user.habilitations, {nullable : true})
     user: User;
 
-    @ManyToOne(() => FormationType, (formationType) => formationType.habilites, {nullable : true})
+    @ManyToOne(() => FormationType, (formationType) => formationType.habilites, {nullable : true, eager: true})
     formationType: FormationType
 }
