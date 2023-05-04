@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors, HttpStatus, HttpException } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors, HttpStatus, HttpException, ClassSerializerInterceptor } from '@nestjs/common';
 import { FormationTypesService } from './formation-types.service';
 import { CreateFormationTypeDto } from './dto/create-formation-type.dto';
 import { UpdateFormationTypeDto } from './dto/update-formation-type.dto';
@@ -8,6 +8,7 @@ import { AgentFormationTypeDto } from './dto/agent-formationTypeDto';
 import { UsersService } from 'src/users/users.service';
 
 @Controller('formation-types')
+@UseInterceptors(ClassSerializerInterceptor) // Ne renvoie pas les proprietes d'une entité marquées par @Exclude()
 @UseInterceptors(TransformInterceptor) // transforme toutes les responses avec statusCode, status et data
 @ApiTags('TYPE FORMATION') // cree une categorie TYPE FORMATION dans swagger UI
 export class FormationTypesController {

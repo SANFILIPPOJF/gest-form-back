@@ -21,7 +21,13 @@ export class UsersService {
 
   async findOneByCp(cp: string) {
     try {
-      return await User.findOneBy({ cp });
+      return await User.findOne({ where: { cp },
+        relations: { residence: true,
+                    fonction: true,
+                    habilitations: true,
+                    formations: true,
+                    forme: true,
+                    habFormateurs:true} });
     }
     catch (error) {
       throw new InternalServerErrorException();

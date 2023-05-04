@@ -26,7 +26,7 @@ export class User extends BaseEntity{
     @Column({ default: true })
     isActive: boolean;
 
-    @ManyToOne(() => Residence, (residence) => residence.user)
+    @ManyToOne(() => Residence, (residence) => residence.users)
     residence: Residence
 
     @ManyToOne(() => Fonction, (fonction) => fonction.user, {nullable : true})

@@ -13,5 +13,5 @@ export class Residence extends BaseEntity{
     isActive: boolean;
 
     @OneToMany(() => User, (user) => user.residence, {nullable : true})
-    user: User[]
+    users: User[]
 }
