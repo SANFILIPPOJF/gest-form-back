@@ -43,6 +43,16 @@ export class UsersController {
     return await this.usersService.active(userFound, createUserDto, residenceFound, fonctionFound);
   }
 
+  @Get ()
+  async findActives(){
+    const users = await this.usersService.findAll();
+    if (!users) throw new HttpException('No user found', HttpStatus.NOT_FOUND);
+    const activeUsers = users.filter((user) => {
+      return user.isActive
+    })
+    if (!activeUsers) throw new HttpException('No active user found', HttpStatus.NOT_FOUND);
+    return activeUsers
+  }
   @Get('cp/:cp')
   async findOne(@Param('cp') cp: string) {
     if (cp.length != 8) throw new HttpException('CP must have 8 character', HttpStatus.BAD_REQUEST);

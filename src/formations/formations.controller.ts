@@ -125,7 +125,7 @@ export class FormationsController {
       throw new HttpException('ID must be a positive integer', HttpStatus.BAD_REQUEST);
 
     const { date, heure, formTypeId, salleId } = updateFormationDto;
-    if (!date && !heure && !formTypeId)
+    if (!date && !heure && !formTypeId && !salleId)
       throw new HttpException('nothing to update', HttpStatus.BAD_REQUEST);
 
     if (date && (new Date(updateFormationDto.date) < new Date(Date.now())))

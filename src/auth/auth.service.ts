@@ -1,5 +1,4 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { UsersService } from '../users/users.service';
+import { Injectable} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
@@ -12,8 +11,11 @@ export class AuthService {
 
         const payload = { cp: cp, id: id };
         return {
-            statutCode: 200,
-            access_token: await this.jwtService.signAsync(payload),
+            timestamp: new Date().toISOString(),
+            statusCode: 200,
+            data : {
+                access_token: await this.jwtService.signAsync(payload)
+            }
         };
     }
 }

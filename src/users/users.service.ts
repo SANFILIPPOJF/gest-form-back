@@ -18,6 +18,16 @@ export class UsersService {
     }
   }
 
+  async findAll (){
+    try {
+      return await User.find({ 
+        relations: { residence: true,
+                    fonction: true} });
+    }
+    catch (error) {
+      throw new InternalServerErrorException();
+    }
+  }
   async findOneByCp(cp: string) {
     try {
       return await User.findOne({ where: { cp },
