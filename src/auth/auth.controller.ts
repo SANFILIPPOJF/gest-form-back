@@ -4,12 +4,15 @@ import { AuthService } from './auth.service';
 import { SignInDto } from './dto/sign-in.dto';
 import { UsersService } from 'src/users/users.service';
 import * as bcrypt from 'bcrypt';
+import { ApiTags,ApiOperation } from '@nestjs/swagger';
 
+@ApiTags('AUTHENTIFICATION')
 @Controller('auth')
 export class AuthController {
     constructor(private usersService: UsersService
         , private authService: AuthService) { }
 
+    @ApiOperation ({ summary: 'Connexion à un compte utilisateur' })
     @HttpCode(HttpStatus.OK)
     @Post('login')
     async signIn(@Body() signInDto: SignInDto) {

@@ -1,8 +1,9 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors, HttpException, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors, HttpException, HttpStatus, UseGuards } from '@nestjs/common';
 import { FonctionsService } from './fonctions.service';
 import { FonctionDto } from './dto/fonction.dto';
 import { TransformInterceptor } from 'src/interceptor/TransformInterceptor';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 
 @Controller('fonctions')
 @UseInterceptors(TransformInterceptor) // transforme toutes les responses avec statusCode, status et data
@@ -10,6 +11,8 @@ import { ApiTags } from '@nestjs/swagger';
 export class FonctionsController {
   constructor(private readonly fonctionsService: FonctionsService) {}
 
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: "Création d'une nouvelle fonction" })
   @Post()
   async create(@Body() fonctionDto: FonctionDto) {
   const sameFonction = await this.fonctionsService.findOneByName(fonctionDto.name);

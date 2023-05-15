@@ -1,4 +1,4 @@
-import { ApiHideProperty } from '@nestjs/swagger';
+import { ApiHideProperty, ApiProperty } from '@nestjs/swagger';
 import { Entity, Column, PrimaryGeneratedColumn, BaseEntity, ManyToOne, ManyToMany, JoinTable, OneToMany } from 'typeorm';
 import { Exclude } from 'class-transformer';
 import { Residence } from 'src/residences/entities/residence.entity';
@@ -9,9 +9,11 @@ import { Habilitation } from 'src/habilitations/entities/habilitation.entity';
 
 @Entity('agents')
 export class User extends BaseEntity{
+    @ApiProperty()
     @PrimaryGeneratedColumn()
     id: number;
 
+    @ApiProperty()
     @Column({ unique: true })
     cp: string;
 
@@ -20,15 +22,19 @@ export class User extends BaseEntity{
     @Column()
     password: string;
 
+    @ApiProperty()
     @Column()
     name: string;
 
+    @ApiProperty()
     @Column({ default: true })
     isActive: boolean;
 
+    @ApiProperty()
     @ManyToOne(() => Residence, (residence) => residence.users)
     residence: Residence
 
+    @ApiProperty()
     @ManyToOne(() => Fonction, (fonction) => fonction.user, {nullable : true})
     fonction: Fonction
 
