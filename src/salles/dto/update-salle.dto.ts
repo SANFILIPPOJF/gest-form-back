@@ -1,6 +1,6 @@
 import { PartialType } from '@nestjs/swagger';
 import { CreateSalleDto } from './create-salle.dto';
-import { IsInt, IsOptional, IsString } from 'class-validator';
+import { IsOptional } from 'class-validator';
 
 export class UpdateSalleDto extends PartialType(CreateSalleDto) {
     

@@ -1,4 +1,4 @@
-import { IsDate, IsDateString, IsInt, IsNotEmpty, IsPositive } from "class-validator";
+import { IsDateString, IsInt, IsNotEmpty, IsPositive } from "class-validator";
 
 export class CreateHabilitationDto {
     @IsDateString()

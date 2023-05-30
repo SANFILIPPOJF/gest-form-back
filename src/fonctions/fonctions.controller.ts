@@ -3,7 +3,6 @@ import { FonctionsService } from './fonctions.service';
 import { FonctionDto } from './dto/fonction.dto';
 import { TransformInterceptor } from 'src/interceptor/TransformInterceptor';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
-import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 
 @Controller('fonctions')
 @UseInterceptors(TransformInterceptor) // transforme toutes les responses avec statusCode, status et data
@@ -11,7 +10,6 @@ import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 export class FonctionsController {
   constructor(private readonly fonctionsService: FonctionsService) {}
 
-  @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: "Création d'une nouvelle fonction" })
   @Post()
   async create(@Body() fonctionDto: FonctionDto) {

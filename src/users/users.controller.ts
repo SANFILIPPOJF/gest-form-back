@@ -33,7 +33,7 @@ export class UsersController {
       * * Contrôler les données entrantes lors de la création d'un User.
       * * Envoi d'un message correspondant au résultat de la requête.
       */
-  @UseGuards(JwtAuthGuard)
+//  @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: "Creer un nouvel agent" })
   @ApiResponse ({ status:201, description:'Agent ajouté'})
   @Post()

@@ -1,4 +1,4 @@
-import { IsInt, IsPositive, isNotEmpty } from 'class-validator';
+import { IsInt, IsPositive } from 'class-validator';
 
 export class AgentFormationDto {
 

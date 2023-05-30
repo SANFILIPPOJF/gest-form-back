@@ -22,12 +22,17 @@ export class UsersService {
     try {
       return await User.find({ 
         relations: { residence: true,
-                    fonction: true} });
+                    fonction: true,
+                    habilitations: true,
+                    formations : true,
+                    forme: true,
+                    habFormateurs:true} });
     }
     catch (error) {
       throw new InternalServerErrorException();
     }
   }
+
   async findOneByCp(cp: string) {
     try {
       return await User.findOne({ where: { cp },
@@ -93,6 +98,7 @@ export class UsersService {
       throw new InternalServerErrorException();
     }
   }
+  
   async remove(user: User) {
     try {
       user.isActive=false;

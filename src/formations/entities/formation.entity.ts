@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString } from "class-validator";
+import { IsString } from "class-validator";
 import { FormationType } from "src/formation-types/entities/formation-type.entity";
 import { Salle } from "src/salles/entities/salle.entity";
 import { User } from "src/users/entities/user.entity";
